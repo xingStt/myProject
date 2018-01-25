@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>医嘱查询</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/mui.picker.min.css" />
+		<style>
+			body{
+				background: #F6F6F6;
+			}
+			.mui-card-header{
+				height: 3.8rem;
+			}
+			
+			.mui-card-header>a{
+				font-size: 1.75rem!important;
+				color: #999;
+			}
+			.mui-card-link{
+				font-size:1.1rem ;
+				color: #444;
+			}
+			.mui-card-link.active{
+				color: #0FA3E5;
+			}
+			.advince-header{
+				margin: 0 1rem;
+				padding: 0.5rem;
+				line-height: 2.5rem;
+				border-bottom: 1px solid #F6F6F6;
+			}
+			.advince-header>span{
+				font-size: 1.5rem;
+				color: #333;
+			}
+			.advince-header>span:nth-child(2){
+				margin-left: 4rem;
+			}
+			.advince-header>span:nth-child(3){
+				margin-left: 2rem;
+			}
+			.advince-content{
+				padding: 0.5rem 0 0.5rem 1.5rem;
+				line-height: 3rem;
+				border-bottom: 1px solid #BBBBBB;
+				color: #666;
+				font-size: 1.6rem;
+			}
+			.advince-content:last-child{
+				border-bottom:none;
+			}
+			.advince-content>span{
+				color: #0FA3E5;
+				font-size: 1.5rem;
+				margin-right: 0.3rem;
+			}
+			.advince-type{
+				display: none;
+			}
+			.advince-type.active{
+				display: block;
+			}
+			#content{
+				width: 100%;
+			}
+			#dateSearch{
+				padding-top: 0.2rem;
+				background-color: #F6F6F6;
+				width: 100%;
+				height: 6.5rem;
+				position: fixed;
+				box-shadow: 1px 2px 3px rgba(187,187,187,0.2);
+			}
+			.searchHeader{
+				width: 100%;
+			}
+			.mui-card-footer:before, .mui-card-header:after{
+				height: 0;
+			}
+			.dateclear{
+				width: 60%;
+				float: left;
+			}
+			.timebtn{
+				width: 60%;
+				height: 3rem;
+				border: 0px;
+				font-size:1.3rem ;
+				line-height: 3rem;
+				background-color: #F6F6F6;
+				display: block;
+				float: left;
+				color: #333333;
+			}
+			.icon-clear {
+				width: 6rem;
+				height: 2rem;
+				background: rgba(15,161,255,1);
+				color: #FFFFFF;
+				text-align: center;
+				line-height: 2.2rem;
+				border-radius: 5px;
+				margin-top: 0.8rem;
+				float: left;
+				display: none;
+			}
+			.searchDiv{
+				float: left;
+				height: 2.6rem;
+				line-height: 3rem;
+				padding: 0 1rem 0 1rem;
+				background-color: #F6F6F6;
+				margin-top: 0.3rem;
+				border-radius: 5px;
+				font-size:1.1rem ;
+			}
+			.searchDiv.yz_type_active{
+				color: #FFFFFF;
+				background-color:#0fa1ff ;
+			}
+			.mui-content{
+				background: #F6F6F6;
+				padding: 7rem 2rem 2rem 2rem;
+			}
+			.mui-btn-blue, .mui-btn-primary, input[type=submit]{
+				background-color:#0fa1ff ;
+				border-color: #0fa1ff;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="content">
+			<div id="dateSearch">
+				<div class="searchHeader" style="height: 3rem;">
+					<div class="dateclear">
+						<button id='begindate' date-potion="" class="timebtn">点我选择日期</button>
+						<div class="icon-clear">
+							<!--<span class="mui-icon mui-icon-closeempty"></span>-->
+							重置时间
+						</div>
+					</div>
+					<div id="all" yz_type="" class="searchDiv yz_type_active">
+						<span>全部</span>
+					</div>
+					<div id="temporary" yz_type="1" class="searchDiv">
+						<span>临时医嘱</span>
+					</div>
+					<div id="long" yz_type="2" class="searchDiv">
+						<span>长期医嘱</span>
+					</div>
+				</div>
+				<div id="searchbox" class="mui-input-row mui-search" style="margin-top: 0.5rem;background: #FFF;padding: 0 0.5rem;">
+					<div class="mui-card-header">
+						<a id="syLink" style="margin-left: 1rem;" class="mui-card-link active" target="syItem">输液</a>
+						<a id="kfLink" class="mui-card-link" target="kfItem">口服</a>
+						<a id="zsLink" class="mui-card-link" target="zsItem">注射</a>
+						<a id="whLink" class="mui-card-link" target="whItem">雾化</a>
+						<a id="psLink" class="mui-card-link" target="psItem">皮试</a>
+						<a id="qtLink" style="margin-right: 1rem;" class="mui-card-link" target="qtItem">其它</a>
+					</div>
+				</div>
+			</div>
+			<div class="mui-content">
+				<div>
+					<div>
+						<div id="syItem" class="advince-type active">
+						</div>
+						<div id="kfItem" class="advince-type">
+						</div>
+						<div id="zsItem" class="advince-type">
+						</div>
+						<div id="whItem" class="advince-type">
+						</div>
+						<div id="psItem" class="advince-type">
+						</div> 
+						<div id="qtItem" class="advince-type">
+						</div> 
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="../script/mui.min.js"></script>
+		<script src="../script/zepto.min.js"></script>
+		<script type="text/javascript" src="../script/mui.picker.min.js" ></script>
+		<script type="text/javascript" src="../script/Url.js" ></script>
+		<script>
+			mui.init({
+			  gestureConfig:{
+			   tap: true, //默认为true
+			   doubletap: false, //默认为false
+			   longtap: false, //默认为false
+			   swipe: true, //默认为true
+			   drag: false, //默认为true
+			   hold:false,//默认为false，不监听
+			   release:false//默认为false，不监听
+			  }
+			});
+			var type="sy";
+			var yz_type="";
+			$('.mui-card-link').on('tap',function(){
+				$(this).addClass("active");
+				$(this).siblings().removeClass("active");
+				var item = $(this).attr('target');
+				$('#'+item).addClass("active");
+				$('#'+item).siblings().removeClass("active");
+				
+				$("#long").removeClass("yz_type_active");
+				$("#temporary").removeClass("yz_type_active");
+				$("#all").addClass("yz_type_active");
+				if(item=='syItem'){
+					type='sy';
+				}
+				if(item=='kfItem'){
+					type='kf';
+				}else if(item=='zsItem'){
+					type = 'zs';
+				}else if(item=='whItem'){
+					type = 'wh';
+				}else if(item=='psItem'){
+					type = 'ps';
+				}else if(item=='qtItem'){
+					type = 'qt';
+				}
+				yz_type="";
+				loadAdvince(type,yz_type);
+			})
+			//选择长期医嘱或者临时医嘱
+			$(".searchDiv").bind('tap',function(){
+				$(this).addClass("yz_type_active");
+				$(this).siblings().removeClass("yz_type_active");
+				yz_type = $(this).attr("yz_type");
+				loadAdvince(type,yz_type);
+			});
+			
+			var dtpicker = new mui.DtPicker({
+			    type: "date"//设置日历初始视图模式 
+			})
+			//点击日期选择填出选择器
+			$(".timebtn").bind('tap',function(){
+				var id=$(this).attr("id");
+				dtpicker.show(function(selectItems) {//选择时间后的事件处理
+					var	time=selectItems.y.value+"-"+selectItems.m.value+"-"+selectItems.d.value
+					$("#"+id).html(time);
+					$("#"+id).attr("date-potion",time);
+					loadAdvince(type,yz_type);
+					$(".icon-clear").css("display","block");
+				})
+			});
+			
+			$(".icon-clear").bind('tap',function(){
+				$("#begindate").html("点我选择日期");
+				$("#begindate").attr("date-potion","");
+				$(this).css("display","none");
+				loadAdvince(type,yz_type);
+			});
+			
+			var patientid = localStorage.getItem("patientid");
+			$(document).ready(function() {
+				loadAdvince(type,yz_type);
+			});
+			function loadAdvince(type,yz_type){
+				$.ajax({
+					type: "post",
+					url: Url_ + "/deskNurse/doctor/getAdvinceNoteByPatientid.do",
+					data: {
+						'patientid': patientid,
+						'item_type': type,
+						'yz_type':yz_type,
+						'time':$("#begindate").attr("date-potion")
+					},
+					dataType: 'json',
+					success: function(data) {
+			        	activeAdvince(data,type);
+			        }
+			    });
+			}
+			function activeAdvince(advince,type){
+				if(advince.length==0){
+					$('#'+type+'Item').html('<div style="text-align: center;margin-top: 4rem;color: #999;font-size: 1.5rem;">没有该项医嘱</div>');
+					return;
+				}
+				$('#'+type+'Link').addClass("active");
+				$('#'+type+'Link').siblings().removeClass("active");
+				$('#'+type+'Item').addClass("active");
+				$('#'+type+'Item').siblings().removeClass("active");
+				var html = '';
+				for(var i=0;i<advince.length;i++){
+					var pinci;
+					if(advince[i].pinci){
+						pinci = advince[i].pinci;
+					}else{
+						pinci = "qd";
+					}
+					html+='<div class="advince-header">'+
+							'<span>频次：'+pinci+'</span>'+
+							'<span>开单医生：'+advince[i].doctor+'</span><br>';
+					var itemname = advince[i].itemname;
+					var itemnamearr = itemname.split('$&');
+					if(type!='ps'){
+						var usestyle = advince[i].usestyle;
+						var dose = advince[i].dose;
+						var unit = advince[i].unit;
+						if(usestyle){
+							var usestylearr = usestyle.split('$&');
+						}
+						if(dose){
+							var dosearr = dose.split('$&');
+						}
+						if(unit){
+							var unitarr = unit.split('$&');
+						}
+						if(advince[i].enddate){
+							html+='<span>开始时间：'+advince[i].begindate+'</span><br>'+
+								'<span>停止时间：'+advince[i].enddate+'</span>';
+						}else{
+							html+='<span>开始时间：'+advince[i].begindate+'</span>';
+						}
+						html+='</div><div class="advince-content">';
+						if(itemnamearr.length>1){
+							for(var j=0;j<itemnamearr.length;j++){
+								html +='<span>-</span>'+itemnamearr[j]
+								if(dosearr[j]){
+									html +=dosearr[j]+unitarr[j]+'--'+usestylearr[j]
+								}
+								html +='<br>';
+							}
+							//html +='<span>-</span>'+itemnamearr[j];
+						}else{
+							html +='<span>-</span>'+itemname
+							if(dose){
+								html+=dose+unit+'--'+usestyle+'';
+							}
+						}
+					}else{
+						var psresult;
+						if(advince[i].ps_result){
+							psresult = advince[i].ps_result;
+						}else{
+							psresult = '未出结果';
+						}
+						html+='<span>开始时间：'+advince[i].begindate+'</span><br>'+
+							  '<span>皮试结果：'+psresult+'</span>';
+						html+='</div><div class="advince-content">';
+						if(itemnamearr.length>1){
+							for(var j=0;j<itemnamearr.length;j++){
+								html +='<span>-</span>'+itemnamearr[j]+'<br>';
+							}
+							html +='<span>-</span>'+itemnamearr[j];
+						}else{
+							html +='<span>-</span>'+itemname;
+						}
+					}
+					html+='</div>';
+				}
+				$('#'+type+'Item').html(html);
+			}
+		</script>
+	</body>
+</html>

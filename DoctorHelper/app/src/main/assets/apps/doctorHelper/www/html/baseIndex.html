@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>病人首页</title>
+    <link rel="stylesheet" type="text/css" href="../css/mui.min.css"/>
+    <style type="text/css">
+    	body{
+    		background: #F6F6F6;
+    	}
+    	
+    	div{
+    		color: #333;
+    		font-size: 1.75rem;
+    		padding: 1.5rem 0 1.5rem 1.5rem;
+    	}
+    	
+    	div>span{
+    		color: #666;
+    	}
+    	
+    	@media only screen and (max-width:900px ) {
+    		div{
+	    		padding: 1.5rem 0 1.5rem 0.2rem;
+	    	}
+    	}
+    </style>
+</head>
+<body id="body">
+</body>
+</html>
+<script src="../script/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/mui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react-dom.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/babel.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/Url.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+</script>
+
+<script type="text/babel">
+	load();
+	
+	function load(){
+		$.ajax({
+	        type: 'POST',
+	        url: Url_+'/deskNurse/doctor/getPatient.do',
+	        data:{patientid:localStorage.getItem("patientid")},
+	        dataType: "json",
+	        success: function(data){
+	        	ReactDOM.render(
+			  	  <Base data = {data}/>,
+				  document.getElementById('body')
+				);
+	        }
+	 	});
+	}
+	
+	function QfCost(props){
+		let cost = props.cost;
+		let qfCost = 0;
+		if(cost<0){
+			qfCost = -cost;
+		}
+		return (
+			<div class="mui-col-sm-6">
+	    		<span>欠费：</span>{qfCost}
+	    	</div>
+		);
+	}
+	
+	function Base(props){
+		let data = props.data;
+		return(
+		  <div class="mui-row" id="content">
+			<div class="mui-col-sm-6">
+	    		<span>住院号：</span>{data.zyh}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>身份证：</span>{data.idcard}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>性别：</span>{data.sex}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>年龄：</span>{data.age}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>电话：</span>{data.tel}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>护理级别：</span>{data.nl}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>入院日期：</span>{data.rydate}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>医保类型：</span>{data.paytype}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>住院医生：</span>{data.zydoctor}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>总费用：</span>{data.tc}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>预交费：</span>{data.ac}
+	    	</div>
+	    	<QfCost cost={data.hj}/>
+	    	<div class="mui-col-sm-12">
+	    		<span>诊断：</span>{data.diagnosis}
+	    	</div>
+	      </div>
+		);
+	}
+</script>

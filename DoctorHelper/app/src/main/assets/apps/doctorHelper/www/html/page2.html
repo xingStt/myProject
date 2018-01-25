@@ -1,0 +1,432 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>病人首页</title>
+    <link rel="stylesheet" type="text/css" href="../css/mui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/page2/page2.css"/>
+</head>
+<body>
+    <header id='header' class="mui-bar mui-bar-nav">
+    	<div class="mui-row" id="headerbox">
+	        <div class="mui-col-sm-5 mui-col-xs-12">
+	        		<div class="left-daohang">
+		    			<span id="empname"></span>
+		    			<span id="bedno"></span>
+		    		</div>
+	        </div>
+	        <div class="mui-col-sm-7 mui-col-xs-12">
+	        		<div class="right-daohang">
+	    				<div id="yz_div">
+	    					<div> 
+	    						<span class="mui-icon icon-yizhu"></span>
+	    					</div>
+	    					<div>
+	    						<span class="yz">医嘱</span>
+	    					</div>
+	    				</div>
+	    				<div id="bq_div">
+	    					<div>
+	    						<span class="mui-icon icon-bq"></span>
+	    					</div>
+	    					<div>
+	    						<span class="bq">便签</span>
+	    					</div>
+	    				</div>
+	    				<div id="return_div">
+	    					<div>
+	    						<span class="mui-icon icon-return"></span>
+	    					</div>
+	    					<div>
+	    						<span class="return">返回</span>
+	    					</div>
+	    				</div>
+	    		</div>
+	        </div>
+    	</div>
+    </header>
+    <!-- 侧滑导航根容器 -->
+	<div class="mui-off-canvas-wrap mui-draggable">
+	  <!-- 菜单容器 -->
+	  <aside class="mui-off-canvas-left" >
+	    <div id="mui-scroll-wrapper" class="mui-scroll-wrapper menu-wrapper">
+	      <div class="mui-scroll">
+	      		<div class="scroll-left">
+		    		<div id="baseIndex"  class="menu active" style="border-bottom: none;">
+		    			<span>基本信息</span>
+		    		</div>
+		    		<div id="twd" class="menu">
+		    			<span>体温单</span>
+		    		</div>
+		    		<div id="ckyz" class="menu">
+		    			<span>查看医嘱</span>
+		    		</div>
+		    		<div id="jybg" class="menu">
+		    			<span>检验报告</span>
+		    		</div>
+		    		<div id="jcbg" class="menu">
+		    			<span>检查报告</span>
+		    		</div>
+		    		<div id="hzjl" class="menu">
+		    			<span>会诊记录</span>
+		    		</div>
+		    		<div id="ryjl" class="menu">
+		    			<span>入院记录</span>
+		    		</div>
+		    		<div id="bcjl" class="menu">
+		    			<span>病程记录</span>
+		    		</div>
+		    		<div id="qtjl" class="menu">
+		    			<span>其他记录</span>
+		    		</div>
+		    		<div id="cyjl" class="menu last-menu">
+		    			<span>出院记录</span>
+		    		</div>
+		    		<div id="bqck" class="menu last-menu">
+		    			<span>便签查看</span>
+		    		</div>
+		    		<div class="inbtn"><span class="mui-icon arrow-left"></span></div>
+		    	</div>
+	      </div>
+	    </div>
+	  </aside>
+	  <!-- 主页面容器 -->
+	  <div id="mui-inner-wrap" class="mui-inner-wrap" style="background: #F6F6F6;">
+	    <div class="mui-content mui-scroll-wrapper" style="padding-top: 5.5rem;background: #FFF;">
+	      <div class="mui-scroll" style="height: 100%;background: #F6F6F6;" id="content-scroll">
+	      	<div id="baseIndex-content">
+	      	</div>
+	        <iframe style="display: none;" id="iframe" src="baseIndex.html" scrolling="yes" name="showPdf" frameborder="0" ></iframe>
+	      </div>
+	    </div>  
+	  </div>
+	</div>
+	<div class="outbtn"><span class="mui-icon arrow-right"></span></div>
+	
+	<!-- 医嘱类型选择 -->
+	<div class="advinceClass">
+		<div id="jyBtn">检验医嘱</div>
+		<div id="jcBtn">检查医嘱</div>
+		<!--<div id="zlBtn">治疗医嘱</div>-->
+	</div>
+</body>
+</html>
+<script src="../script/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/zepto.fx.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react-dom.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/babel.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/common.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/mui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/Url.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	//屏幕旋转时，重新加载
+    window.onorientationchange = function() { // 移动端测试有用,屏幕颠倒时
+    	var iHeight = screen.height - $('header').height()-100;
+		var iWidth;
+		if(screen.width>screen.height){
+			/*document.getElementById('mui-scroll-wrapper').addEventListener('drag', function(event) {
+			    event.stopPropagation();
+			});*/
+			if(!mui('.mui-off-canvas-wrap').offCanvas().isShown()){
+				mui('.mui-off-canvas-wrap').offCanvas('show');
+			};
+			$('.outbtn').css('display','none');
+			iWidth = screen.width-$('.scroll-left').width();
+		}
+		if(screen.width<screen.height){
+			mui('.mui-off-canvas-wrap').offCanvas('close');
+			$('.outbtn').css('display','block');
+			iWidth = screen.width;
+		}
+		$('#iframe').width(iWidth);
+		$('#iframe').height(iHeight);
+	};
+	
+	var runtime;
+	var plus;
+    mui.plusReady(function(){
+    	runtime = plus.runtime;
+    	plus = plus;
+    	document.getElementById('content-scroll').addEventListener('drag', function(event) {
+		    event.stopPropagation();
+		});
+    	
+		initPatient();
+		//自定义关闭事件
+		mui.back=function(){
+			if(MENU_LEVEL==1){
+				plus.webview.currentWebview().close();
+				localStorage.removeItem("patientid");
+			}else{
+				MENU_LEVEL--;
+			}
+		}
+		
+		$('#return_div').on('tap',function(){
+			if(MENU_LEVEL==1){
+				mui.back();
+			}else{
+				MENU_LEVEL--;
+				var iframe = document.getElementById("iframe");
+				iframe.contentWindow.location = "nismain.html";
+			}
+		});
+		
+	});
+	
+	var zyh;
+	
+	function initPatient(){
+		$.ajax({
+			type:'POST',
+			url:Url_+'/deskNurse/doctor/getPatientNameAndBed.do',
+			data:{patientid:localStorage.getItem("patientid")},
+			dataType:'json',
+			success:function(data){
+				$('#empname').html(data.pname);
+				$('#bedno').html(data.bedno);
+				zyh = data.zyh;
+			}
+		});
+		
+		
+	}
+    
+    //绑定医嘱点击按钮
+    $('#yz_div').on('tap',function(){
+    	return mui.toast("开发中，敬请期待");
+    	var top = $('#headerbox').height();
+    	$('.advinceClass').css('top',top);
+    	$('.advinceClass').css('left',$(this).offset().left-50);
+    	$(".advinceClass").fadeIn(500);
+    });
+    
+    $('#bq_div').on('tap',function(){
+    	//return mui.toast("开发中，敬请期待");
+    	mui.openWindow({
+    		url:'note.html',
+    		id:'note',
+    		videoFullscreen: 'auto',
+    		hardwareAccelerated:'true'
+    	});
+    });
+    
+    $('#jyBtn').on('tap',function(){
+    	var iframe = document.getElementById('iframe');
+    	iframe.src="advince_jy.html";
+    	$(".advinceClass").fadeOut();
+    });
+    
+    $('#jcBtn').on('tap',function(){
+    	$('.menu.active').css('border-bottom','1px dashed rgba(204,204,204,.6)');
+    	$('.menu.active').css('border-top','1px dashed rgba(204,204,204,.6)');
+    	$('.menu.active').removeClass('active');
+    	var iframe = document.getElementById('iframe');
+    	iframe.src="advince_jc.html";
+    	$(".advinceClass").fadeOut();
+    });
+    
+    $('#zlBtn').on('tap',function(){
+    	$(".advinceClass").fadeOut();
+    });
+    
+    $('#yz_div').on('mouseleave',function(){
+    	$(".advinceClass").fadeOut();
+    });
+    
+	//点击左侧菜单变色
+	$(".scroll-left").on("tap", "div", function() {
+		$(".scroll-left .menu").eq($(this).index()).addClass("active").siblings().removeClass("active");
+	});
+	
+	var iHeight = document.documentElement.clientHeight - $('header').height()-44;
+	var iWidth;
+	if(screen.width>screen.height){
+		mui('.mui-off-canvas-wrap').offCanvas('show');
+		iWidth = document.documentElement.clientWidth-$('.scroll-left').width();
+		document.getElementById('mui-scroll-wrapper').addEventListener('drag', function(event) {
+		    event.stopPropagation();
+		});
+	}else{
+		$('.outbtn').css('display','block');
+		iWidth = document.documentElement.clientWidth;
+	}
+	$('#iframe').width(iWidth);
+	$('#iframe').height(iHeight);
+	
+	var title = "入院记录";
+	var fileName = 'demo.pdf';
+	
+	var MENU_LEVEL = 1;
+	//菜单切换
+	$('.menu').on('tap',function(){
+		var id = $(this).attr('id');
+		if(id!='baseIndex'){
+			$('#baseIndex').css('border-top','1px dashed rgba(204,204,204,.6)');
+			$('#iframe').show();
+			$('#baseIndex-content').hide();
+		}else{
+			MENU_LEVEL = 1;
+			$('#iframe').hide();
+			$('#baseIndex-content').show();
+			$('#baseIndex').css('border-top','hidden');
+		}
+		
+		$(this).css('border-bottom','hidden');
+		$(this).siblings().css('border-bottom','1px dashed rgba(204,204,204,.6)');
+		$(this).prev().css('border-bottom','hidden');
+		$('.last-menu').css('border-bottom','hidden');
+		//$(this).css('border-bottom','hidden');
+		//竖屏时点击菜单收起菜单
+		if(screen.width<screen.height){
+			mui('.mui-off-canvas-wrap').offCanvas('close');
+			$('.outbtn').css('display','block');
+		}
+		
+		var iframe = document.getElementById('iframe');
+		
+		if(id=="ryjl"){
+			title = '入院记录';
+			fileName = zyh+'入院记录.pdf';
+			iframe.src = "view.html";
+		}
+		
+		if(id=='bcjl'){
+			title = '病程记录';
+			fileName = zyh+'病程记录.pdf';
+			iframe.src = "view.html";
+		}
+		
+		if(id=='cyjl'){
+			title = '出院记录';
+			fileName = zyh+'出院记录.pdf';
+			iframe.src = "view.html";
+		}
+		
+		if(id=='qtjl'){
+			title = '其他记录';
+			fileName = zyh+'其他记录.pdf';
+			iframe.src = "view.html";
+		}
+		
+		if(id=='jcbg'){
+			iframe.src = "pacs.html";
+		}
+		
+		if(id=='hzjl'){
+			iframe.src = "HzRecord.html";
+		}
+		
+		if(id=="jybg"){
+			iframe.src = "nismain.html";
+		}
+		if(id=="ckyz"){
+			iframe.src = "advinceNote.html";
+		}
+		if(id=='twd'){
+			iframe.src = "temperature.html";
+		}
+		if(id=='bqck'){
+			iframe.src = "noteList.html";
+			//解决iframe中的video全屏按钮无法显示问题
+			$("#iframe").attr("allowfullscreen","true");
+			$('#iframe').attr("webkitallowfullscreen","true");
+			$('#iframe').attr("mozallowfullscreen","true");
+		}
+	});
+	
+	//显示滚动条
+	mui('.mui-scroll-wrapper').scroll();
+	
+	$(".inbtn").on('tap',function(){
+		mui('.mui-off-canvas-wrap').offCanvas('close');
+		$('.outbtn').css('display','block');
+	})
+	
+	$(".outbtn").on('tap',function(){
+		mui('.mui-off-canvas-wrap').offCanvas('show');
+		$('.outbtn').hide();
+	})
+	
+</script>
+
+
+<script type="text/babel">
+	load();
+	
+	function load(){
+		$.ajax({
+	        type: 'POST',
+	        url: Url_+'/deskNurse/doctor/getPatient.do',
+	        data:{patientid:localStorage.getItem("patientid")},
+	        dataType: "json",
+	        success: function(data){
+	        	ReactDOM.render(
+			  	  <Base data = {data}/>,
+				  document.getElementById('baseIndex-content')
+				);
+	        }
+	 	});
+	}
+	
+	function QfCost(props){
+		let cost = props.cost;
+		let qfCost = 0;
+		if(cost<0){
+			qfCost = -cost;
+		}
+		return (
+			<div class="mui-col-sm-6">
+	    		<span>欠费：</span>{qfCost}
+	    	</div>
+		);
+	}
+	
+	function Base(props){
+		let data = props.data;
+		return(
+		  <div class="mui-row" id="content">
+			<div class="mui-col-sm-6">
+	    		<span>住院号：</span>{data.zyh}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>身份证：</span>{data.idcard}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>性别：</span>{data.sex}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>年龄：</span>{data.age}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>电话：</span>{data.tel}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>护理级别：</span>{data.nl}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>入院日期：</span>{data.rydate}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>医保类型：</span>{data.paytype}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>住院医生：</span>{data.zydoctor}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>总费用：</span>{data.tc}
+	    	</div>
+	    	<div class="mui-col-sm-6">
+	    		<span>预交费：</span>{data.ac}
+	    	</div>
+	    	<QfCost cost={data.hj}/>
+	    	<div class="mui-col-sm-12">
+	    		<span>诊断：</span>{data.diagnosis}
+	    	</div>
+	      </div>
+		);
+	}
+</script>

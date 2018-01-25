@@ -1,0 +1,499 @@
+@font-face {
+    font-family: Muiicons;
+    font-weight: normal;
+    font-style: normal;
+    src: url('../fonts/icomoon.ttf') format('truetype');
+}
+
+body{
+	margin: 0;
+	padding: 0;
+	background: #F6F6F6;
+	line-height: 2rem;
+}
+
+#header{
+	margin: 0;
+	padding: 0;
+}
+
+#headerbox{
+	height: 5.5rem;
+	background: #0fa1ff;
+}
+
+.mui-bar-nav~.mui-content{
+	padding-top: 5.5rem;
+	padding-bottom: 6.125rem;
+}
+
+#empname{
+	font-family: PingFang-SC-Medium;
+	font-size: 2.25rem;
+	line-height: 5.5rem;
+	color: #ffffff;
+}
+
+#dept{
+	color: #FFF;
+	font-size: 1.4rem;
+}
+
+
+#deptname{
+	font-family: PingFang-SC-Medium;
+	font-size: 1.5rem;
+	color: #ffffff;
+}
+
+#search{
+	margin-top: 1rem;
+	height: 3.5rem;
+	background-color: #0d91e5;
+	border-radius: 1.75rem;
+	color:#e3f6ff;
+	font-size: 2rem;
+	text-align: center;
+}
+
+.mui-placeholder>span:last-child{
+	width: 12rem;
+	height: 1.5rem;
+	font-family: PingFang-SC-Medium;
+	font-size: 1.5rem;
+	line-height: 5.5rem;
+	color: #e3f6ff;
+}
+
+.mui-icon-search:before {
+    content: '\e91e';
+	font-size: 1.4rem;
+	color: #e3f6ff;
+}
+
+.mui-input-row.mui-search.mui-active:before{
+	content: '\e466';
+	font-size: 2rem;
+	color: #e3f6ff;
+	top: 2.1rem;
+}
+
+.mui-icon.mui-icon-clear{
+	margin-top: 0.9rem;
+}
+
+.mui-icon.mui-icon-clear:before{
+	color: #e3f6ff;
+	font-size: 2rem;
+}
+
+.setting:before{
+	content: '\e91f';
+	color: #FFF;
+	font-size:3rem ;
+	line-height: 4.2rem;
+}
+.card{
+	width: 36.5rem;
+	height: 16.6rem;
+	background-color: #ffffff;
+	box-shadow: 0 0.37rem 1.25rem 0 rgba(71, 71, 71, 0.1);
+	border-radius: 0.5rem;
+	float: left;
+	margin-top: 0.6rem;
+	margin-left: 0.625rem;
+	margin-right: 2.5rem;
+}
+
+.card-body{
+	height: 12rem;
+}
+
+.card-body-first{
+	height: 6rem;
+	float: left;
+}
+
+.card-body-content{
+	float: left;
+}
+
+.card-sign{
+	height: 3rem;
+}
+
+.card-sign>div{
+	float: left;
+	padding-left: 10px;
+	padding-right: 10px;
+	margin-left: 12px;
+	margin-top: 0.3rem;
+	height: 2rem;
+	line-height: 2.2rem;
+	color: #0fa1ff;
+	background-color:#e7f5ff ;
+	border-radius: 2px;
+	font-size:22px ;
+}
+
+.card-sign>div:first-child{
+	margin-left: 0;
+}
+
+.card-sign>div.none{
+	background-color:#ececec ;
+	color: #999;
+	clear: both;
+}
+
+.card-body-second{
+	height: 9rem;
+	float: left;
+	padding: 0 0.2rem;
+}
+
+.card-body-second>div{
+	height: 2.8rem;
+	line-height: 2.8rem;
+	color: #333333;
+	font-size:1.5rem ;
+}
+
+.card-body-second>div:first-child{
+	font-size:1.8rem !important;
+	margin-top: 0.4rem;
+}
+
+.card-body-third{
+	height: 9rem;
+	float: left;
+	padding-left: 3rem;
+}
+
+.card-body-third>div{
+	height: 2.8rem;
+	line-height: 2.8rem;
+	color: #666666;
+	font-size:1.5rem ;
+}
+
+.card-body-third>div:first-child{
+	margin-top: 0.4rem;
+}
+
+.card-body-third>div>span{
+	color: #333333;
+	font-size:1.5rem ;
+}
+
+.card-body-third>div:first-child>span:last-child{
+	float: right;
+}
+
+.icon-gz{
+	margin-left: 7rem;
+}
+
+.icon-gz:before{
+	content: '\e90f';
+	color: #DDDDDD;
+	font-size: 45px;
+}
+
+.icon-gz.gz-active:before{
+	color: #0fa1ff;
+}
+
+.type-pt-color{
+	color:#0fa1ff !important;
+}
+
+.type-sw-color{
+	color:#999999 !important;
+}
+
+.type-wz-color{
+	color:#e76c5c !important;
+}
+
+.type-bz-color{
+	color:#e5ac22 !important;
+}
+
+.card-footer{
+	height: 4.5rem;
+	border-top:1px solid #F6F6F6 ;
+}
+
+.card-footer>div:first-child{
+	padding-left: 1rem;
+	width: 17rem;
+	float: left;
+}
+
+.card-footer>div:last-child{
+	width: 19rem;
+	float: left;
+}
+
+.card-footer>div>div{
+	float: left;
+}
+
+.card-footer>div>div>span{
+	margin-left: 1rem;
+	line-height: 4.5rem;
+}
+
+.card-footer>div>div:first-child>span{
+	font-size: 2.6rem;
+	color: #666666;
+}
+
+.card-footer>div>div:nth-child(2)>span{
+	margin-bottom: 1rem;
+	font-size: 1.5rem;
+	color: #666666;
+}
+
+.card-footer>div>div:last-child>span{
+	font-size: 2.3rem;
+	color: #0fa1ff;
+}
+
+.sex{
+	width: 9rem;
+	height: 9rem;
+	background: no-repeat;
+	background-size:cover ;
+}
+
+.sex.boy{
+	background-image:url(../image/shouye/boy.png) ;
+}
+
+.sex.girl{
+	background-image:url(../image/shouye/girl.png) ;
+}
+
+.icon-jcbg:before{
+	content: '\e913';
+}
+
+.icon-jybg:before{
+	content: '\e911';
+}
+
+.type{
+	width: 1.9rem;
+	height: 2.5625rem;
+	background: no-repeat;
+	background-size:cover ;
+	margin-left: 2rem;
+}
+
+.type.pt{
+	background-image:url(../image/shouye/icon-pt.png) ;
+}
+
+.type.wz{
+	background-image:url(../image/shouye/icon-wz.png) ;
+}
+.type.bz{
+	background-image:url(../image/shouye/icon-bz.png) ;
+}
+.type.sw{
+	background-image:url(../image/shouye/icon-sw.png) ;
+}
+
+.footer{
+	height: 5rem;
+	background-color: #ffffff;
+	border: none !important;
+	box-shadow: 0 0 1px rgba(0,0,0,.2);
+}
+
+.footer>span{
+}
+
+.p-all:before{
+	content: '\e919';
+	font-size: 1.5rem;
+}
+
+.p-main:before{
+	content: '\e91d';
+	font-size: 2rem;
+}
+
+.p-wz:before{
+	content: '\e91b';
+	font-size: 2rem;
+}
+
+.p-more:before{
+	content: '\e924';
+	font-size: 2rem;
+}
+
+.p-gz:before{
+	content: '\e915';
+	font-size: 2rem;
+}
+
+.p-hz:before{
+	content: '\e917';
+	font-size: 2rem;
+}
+
+.mui-bar-tab .mui-tab-item .mui-icon~.mui-tab-label{
+	font-size: 1.3rem;
+}
+
+.mui-bar-tab .mui-tab-item.mui-active{
+	color: #0fa1ff;
+}
+
+.mui-bar-tab .mui-tab-item{
+	color: #c6cbce;
+	font-size: 1.3rem !important;
+}
+
+.inbutton{
+	width: 4.375rem;
+	height: 4.375rem;
+	border-radius:2.1875rem ;
+	background-color: #ffffff;
+	box-shadow: 0px 0px 20px 0.1px 
+		rgba(15, 161, 255, 0.35);
+	position: relative;
+	bottom: 6.5rem;
+	left: 34.4rem;
+	z-index: 9;
+	text-align: center;
+	padding-left: 0.2rem;
+	line-height: 4.8rem;
+}
+
+.arrow-up:before{
+	content: '\e908';
+	color: #888888;
+}
+
+.mui-loading{
+	margin-top: 20%;
+}
+
+.hidden{
+	display: none;
+}
+
+.setClass{
+	display: none;
+	position: absolute;
+	z-index: 999;
+	top: 0;
+	right: 0;
+	background: #0fa1ff;
+	width: 15rem;
+	height: 16rem;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+
+.setClass>div{
+	height: 4rem;
+	line-height: 4rem;
+	color: #FFF;
+	border-bottom: solid 1px rgba(255,255,255,.7);
+	text-align: center;
+	font-size: 1.75rem;
+}
+
+.setClass>div:last-child{
+	border-bottom: none;
+}
+
+.nl-level{
+	height:3rem;
+	border-radius:2px ;
+	padding-left:1rem;
+	font-size: 22px;
+	line-height: 3rem;
+}
+
+.nl-level.one{
+	color:#e76c5c;
+}
+
+.nl-level.two{
+	color:#e5ac22;
+}
+
+.nl-level.three{
+	color: #0fa1ff;
+}
+
+.moreBtn{
+	display: none;
+	position: fixed;
+	z-index: 999;
+	bottom: 5.1rem;
+	right: 1.5rem;
+	background: #FCFCFC;
+	width: 13rem;
+	height: 16rem;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.moreBtn>div{
+	height: 4rem;
+	line-height: 4rem;
+	color: #666;
+	border-bottom: solid 1px rgba(187,187,187,.2);
+	text-align: center;
+	font-size: 1.5rem;
+}
+
+.moreBtn>div:last-child{
+	border-bottom: none;
+}
+
+@media only screen and (max-width: 1279px){
+	.card{
+		width: 46.2rem;
+	}
+	
+	.card-body-second,.card-body-third{
+		margin-left: 2rem;
+	}
+	
+	.card-footer>div:last-child{
+		margin-left:4rem;
+	}
+	
+	.inbutton{
+		left: 44rem;
+	}
+	
+	#empname{
+		font-size: 1.75rem;
+	}
+	
+	#dept{
+		font-size: 1.2rem;
+	}
+	
+	#doctorInfo{
+		width: 32% !important;
+	}
+	
+	#seachBox{
+		width: 58%!important;
+	}
+	
+	#btnSet{
+		width:10%!important;
+	}
+} 

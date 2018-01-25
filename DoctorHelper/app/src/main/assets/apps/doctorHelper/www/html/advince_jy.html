@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>医嘱查询</title>
+    <link rel="stylesheet" type="text/css" href="../css/mui.min.css"/>
+    <style type="text/css">
+    	table{
+    		width: 100%;
+    	}
+    </style>
+</head>
+<body id="body">
+	<input id="search" type="search" onkeyup="fnSearch()"/>
+	<div id="searchBox" style="height: 10rem;overflow-y: auto;">
+	</div>
+</body>
+</html>
+<script src="../script/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/mui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react-dom.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/babel.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	
+</script>
+
+<script type="text/babel">
+	function fnSearch(){
+		let piniyin = $('#search').val();
+		if(piniyin.length<2){
+			return;
+		}
+		$.ajax({
+	        type: 'POST',
+	        url: 'http://localhost:8080/deskNurse/doctor/getPacsItem.do',
+	        data:{pinyin:piniyin},
+	        dataType: "json",
+	        success: function(data){
+	        	ReactDOM.render(
+			  	  <Table data = {data}/>,
+				  document.getElementById('searchBox')
+				);
+	        }
+	 	});
+	}
+	
+	function Table(props){
+		let data = props.data;
+		let items = [];
+		for(let i=0;i<data.length;i++){
+			items.push(<PacsItem itemid={data[i].itemid} name={data[i].name}
+				dept={data[i].dept} price={data[i].price}/>);
+		}
+		return <table cellspacing="0" cellpadding="0">{items}</table>
+	}
+	
+	class PacsItem extends React.Component{
+	  constructor(props) {
+	    super(props);
+		this.itemid = props.itemid;
+		this.name = props.name;
+		this.dept = props.dept;
+		this.price = props.price;
+	    this.handleClick = this.handleClick.bind(this);
+	  }
+	
+	  handleClick() {
+	    alert(this.itemid);
+	  }
+	
+	  render() {
+	    return (
+	        <tr onClick={this.handleClick}>
+	        	<td>{this.name}</td>
+	        	<td>{this.dept}</td>
+	        	<td>{this.price}</td>
+	        </tr>
+	    );
+	  }
+	}
+</script>

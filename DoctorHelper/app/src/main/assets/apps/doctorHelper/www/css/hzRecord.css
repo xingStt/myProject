@@ -1,0 +1,238 @@
+ @font-face {
+ 	font-family: Muiicons;
+ 	font-weight: normal;
+ 	font-style: normal;
+ 	src: url('../fonts/icomoonPage2.ttf') format('truetype');
+ }
+ 
+body{
+	margin: 0;
+	padding: 0;
+	background: #FFF;
+	touch-action: none;
+	font-size: 1.5rem;
+}
+
+.mui-icon.mui-icon-clear:before{
+	color: #e3f6ff;
+	font-size: 2rem;
+}
+
+#header{
+	margin: 0;
+	padding: 0;
+}
+
+#headerbox{
+	height: 6rem;
+	background: #0fa1ff;
+	opacity: 1;
+}
+
+.mui-bar-nav~.mui-content{
+	padding-top: 6rem;
+	padding-bottom: 6.125rem;
+}
+
+
+.left-daohang{
+	padding-left:3.188rem;
+	float: left;
+}
+
+#empname{
+	width: 6.563rem;
+	height: 2.125rem;
+	font-family: PingFang-SC-Medium;
+	font-size: 2.25rem;
+	font-weight: normal;
+	font-stretch: normal;
+	letter-spacing: 0rem;
+	line-height: 5.5rem;
+	color: #ffffff;
+}
+
+#bedname{
+	width: 5.875rem;
+	height: 1.75rem;
+	font-family: PingFang-SC-Medium;
+	font-size: 1.875rem;
+	font-weight: normal;
+	font-stretch: normal;
+	letter-spacing: 0rem;
+	color: #ffffff;
+	margin-left: 0.688rem;
+}
+
+.right-daohang{
+	padding-right: 1.875rem;
+	float: right;
+	overflow: hidden;
+	text-align: right;
+}
+.right-daohang>div,.right-daohang>div>div{
+	float: left;
+}
+.icon-yizhu:before {
+ 	content: '\e922';
+	width: 2.563rem;
+	height: 2.813rem;
+ }
+ 
+ .yz{
+	width: 3.5rem;
+	height: 1.688rem;
+	font-family: PingFang-SC-Medium;
+	font-size: 1.875rem;
+	font-weight: normal;
+	font-stretch: normal;
+	letter-spacing: 0rem;
+	color: #ffffff;
+	margin-right: 4.375rem;
+	line-height: 5.5rem;
+ }
+ 
+ 
+ .icon-bq:before {
+ 	content: "\e920";
+	width: 3.188rem;
+	height: 2.813rem;
+	margin-right: 0.688rem;
+ }
+ 
+ .bq{
+	width: 3.625rem;
+	height: 1.75rem;
+	font-family: PingFang-SC-Medium;
+	font-size: 1.875rem;
+	font-weight: normal;
+	font-stretch: normal;
+	letter-spacing: 0rem;
+	color: #ffffff;
+	margin-right: 3.438rem;
+	line-height: 5.5rem;
+ }
+ 
+ .icon-return:before{
+ 	content: "\e921";
+	width: 2.688rem;
+	height: 2.875rem;
+	margin-right: 0.688rem;
+ }
+ 
+ .return{
+	width: 3.5rem;
+	height: 1.75rem;
+	font-family: PingFang-SC-Medium;
+	font-size: 1.875rem;
+	font-weight: normal;
+	font-stretch: normal;
+	letter-spacing: 0rem;
+	color: #ffffff;
+	line-height: 5.5rem;
+ }
+ 
+ .icon-yizhu,.icon-bq,.icon-return{
+	font-size: 3.25rem !important;
+	line-height: 4.25rem !important;
+	color: #FFFFFF;
+}
+
+.footer>span{
+}
+
+.p-all:before{
+	content: '\e919';
+	font-size: 1.5rem;
+}
+
+.p-main:before{
+	content: '\e91d';
+	font-size: 2rem;
+}
+
+.p-wz:before{
+	content: '\e91b';
+	font-size: 2rem;
+}
+
+.p-gz:before{
+	content: '\e915';
+	font-size: 2rem;
+}
+
+.p-hz:before{
+	content: '\e917';
+	font-size: 2rem;
+}
+
+
+#card_div{
+	background-color: #ffffff;
+	box-shadow: 0 0.37rem 1.25rem 0 rgba(71, 71, 71, 0.1);
+	border-radius: 0.5rem;
+	float: left;
+	margin-top: 3rem;
+	margin-left: 10%;
+	margin-right: 10%;
+}
+
+#doctor_div{
+	height: 5rem;
+	padding-top: 2rem;
+}
+
+#doctor_div>div{
+	float: left;
+	line-height: 5rem;
+	width: 45%;
+	text-align: center;
+}
+fieldset{
+	margin-top: 3rem;
+	line-height: 2rem;
+}
+legend{
+	font-size: 1.5rem;
+	text-align: center;
+}
+
+
+
+
+@media only screen and (max-width: 1279px) {
+	.left-daohang{
+		padding-left:2rem;
+	}
+	.right-daohang{
+		/*padding-left: 3rem;*/
+		padding-right: 1.188rem;
+	}
+	.icon-yizhu:before {
+		margin-right:0.5rem;
+	 }
+	 
+	 .yz{
+		margin-right: 2.75rem;
+	 }
+	 
+	 .icon-bq:before {
+		margin-right: 0.438rem;
+	 }
+	 
+	 .bq{
+		margin-right: 1.75rem;
+	 }
+	 
+	 .icon-return:before{
+		margin-right: 0.5rem;
+	}
+	.return{
+		width: 3.5rem;
+		height: 1.75rem;
+	}
+}
+
+
+
+

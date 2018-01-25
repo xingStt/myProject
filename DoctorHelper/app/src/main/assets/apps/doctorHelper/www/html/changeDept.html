@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>切换科室</title>
+		<link rel="stylesheet" href="../css/mui.min.css" />
+		<link rel="stylesheet" href="../css/shouye.css" />
+	</head>
+	<body>
+		<div id="selectDept" style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;z-index: 10;
+			background:#F6F6F6;display: none;opacity: 0;padding-top: 20%;">
+			<div style="width: 78%;margin: 0 auto;background: #FBFBFB;border-radius: 0.5rem;
+				border: 1px solid #0FA1FF;">
+				<ul class="mui-table-view" id="deptul">
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>
+<script src="../script/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/zepto.fx.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/mui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react-dom.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/babel.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/common.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/Url.js" type="text/javascript" charset="utf-8"></script>
+
+<script>
+	mui.init();
+	mui.plusReady(function(){
+		var self = plus.webview.currentWebview();
+		var dept = self.data
+		showDepts(dept);
+	});
+	function showDepts(dept){
+		$('#deptul').empty();
+		for(var i=0;i<dept.length;i++){
+			var li = '<li onclick="seleDept(\''+dept[i].deptid+'\',\''+dept[i].dept+'\')" class="mui-table-view-cell" style="font-size:1.75rem;line-height:2.5rem;height:4rem;text-align: center;color: #0FA3E5;">'+
+						dept[i].dept+'</li>';
+			$('#deptul').append(li);
+		}
+		$("#selectDept").fadeIn();
+	}
+	function seleDept(selectDeptid,selectDept){
+		var index =plus.webview.getWebviewById("index");
+		mui.fire(index,"refresh",{
+			'selectDeptid':selectDeptid,
+			'selectDept':selectDept
+		})
+		mui.back();
+	}
+</script>

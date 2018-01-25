@@ -1,0 +1,58 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "27.0.3"
+    defaultConfig {
+        applicationId "com.yinhai.doctorHelper"
+        minSdkVersion 19
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:26.+'
+    testCompile 'junit:junit:4.12'
+    compile files('libs/audio.jar')
+    compile files('libs/barcode.jar')
+    compile files('libs/camera.jar')
+    compile files('libs/contacts.jar')
+    compile files('libs/device.jar')
+    compile files('libs/downloader.jar')
+    compile files('libs/file.jar')
+    compile files('libs/gallery.jar')
+    compile files('libs/GetuiSDK2.10.3.5.jar')
+    compile files('libs/gif.jar')
+    compile files('libs/invocation.jar')
+    compile files('libs/MapApiLocation_1.3.3.jar')
+    compile files('libs/messaging.jar')
+    compile files('libs/Msc.jar')
+    compile files('libs/my-imageloader.jar')
+    compile files('libs/my-nineoldandroids-2.4.0.jar')
+    compile files('libs/mysonic.jar')
+    compile files('libs/nativeObj.jar')
+    compile files('libs/nativeui.jar')
+    compile files('libs/navigatorui.jar')
+    compile files('libs/nopermission.jar')
+    compile files('libs/pdr.jar')
+    compile files('libs/sensor.jar')
+    compile files('libs/speech.jar')
+    compile files('libs/speech_ifly.jar')
+    compile files('libs/ui.jar')
+    compile files('libs/uploader.jar')
+    compile files('libs/xhr.jar')
+}

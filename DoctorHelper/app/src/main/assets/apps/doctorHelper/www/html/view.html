@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<meta charset="UTF-8">
+		<title></title>
+		<link href="../css/jquery.touchPDF.css" rel="stylesheet" media="screen" />
+		<link rel="stylesheet" type="text/css" href="../css/view.css" />
+	</head>
+
+	<body id="body">
+
+		<div id="myPDF" style="height: 100%; width: 100%;overflow-y: auto;"></div>
+
+		<script type="text/javascript" src="../script/pdf.compatibility.js"></script>
+		<script type="text/javascript" src="../script/pdf.js"></script>
+		<script type="text/javascript" src="../script/jquery.min.js"></script>
+		<script type="text/javascript" src="../script/jquery.touchSwipe.js"></script>
+		<script type="text/javascript" src="../script/jquery.touchPDF.js"></script>
+		<script type="text/javascript" src="../script/jquery.panzoom.js"></script>
+		<script type="text/javascript" src="../script/jquery.mousewheel.js"></script>
+		<script src="../script/Url.js" type="text/javascript" charset="utf-8"></script>
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$.ajax({
+					type: 'POST',
+					url: Url_ + '/deskNurse/doctor/checkFileExist.do',
+					data: {
+						fileName: parent.fileName
+					},
+					dataType: 'json',
+					success: function(data) {
+						if(data.success){
+							var title = parent.title;
+							var url = Url_ + '/deskNurse/doctor/getPdfFile.do?fileName=' + parent.fileName;
+							var scale;
+
+							if(screen.width > screen.height) {
+								scale = 1.5;
+							} else {
+								scale = 1.3;
+							}
+
+							$("#myPDF").pdf({
+								source: url,
+								title: title,
+								pdfScale: scale
+							});
+						}else{
+							document.getElementById('body').innerHTML = 
+	        		'<div style="text-align: center;font-size: 2rem;color: #999;margin-top: 20%;">没有相关报告</div>';
+						}
+					}
+				});
+			});
+		</script>
+	</body>
+
+</html>

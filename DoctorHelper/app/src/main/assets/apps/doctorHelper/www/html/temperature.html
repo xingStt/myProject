@@ -1,0 +1,1195 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<style type="text/css">
+	body{
+		margin: 0,auto;
+	}
+	/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/  
+	::-webkit-scrollbar  
+	{  
+	    width: 4px;  
+	    height: 4px;  
+	    background-color: #F6F6F6;  
+	}  
+	  
+	/*定义滚动条轨道 内阴影+圆角*/  
+	::-webkit-scrollbar-track  
+	{  
+	    -webkit-box-shadow: inset 0 0 2px #F6F6F6;  
+	    border-radius: 2px;  
+	    background-color: #F6F6F6;  
+	}  
+	  
+	/*定义滑块 内阴影+圆角*/  
+	::-webkit-scrollbar-thumb  
+	{  
+	    border-radius: 10px;  
+	    -webkit-box-shadow: inset 0 0 2px #F6F6F6;  
+	    background-color: rgba(187,187,187,.6);  
+	} 
+	#switch_div{
+		background-color: #F6F6F6;
+		width: 100%;
+		height: 80px;
+		position: fixed;
+	}
+	.text_{
+		float: left;
+		color: #333;
+		padding-top: 30px;
+	}
+	#tempSwitch,#pulseSwitch,#heartSwitch{
+		float: left;
+		top: 25px;
+		margin-left: 5px;
+	}
+	#tempText{
+		margin-left: 552px;
+	}
+	#pulseText,#heartText{
+		margin-left: 50px;
+	}
+	.mui-switch-blue{ 
+		background-color: #FFFFFF!important; 
+	}
+	.mui-active {
+	color: #0fa1ff;
+	border: 1px solid #0fa1ff!important;
+	background-color: #0fa1ff!important; 
+	}
+	@media only screen and (max-width: 1050px) {
+		#tempText{
+			margin-left: 300px;
+		}
+	}
+</style>
+<link rel="stylesheet" href="../css/mui.min.css" />
+</head>
+<body style="background-color: #F6F6F6;">
+	<div style="display: none;" id="switch_div">
+		<div class="text_" id="tempText">体温</div>
+		<div id="tempSwitch" class="mui-switch mui-switch-blue mui-active">
+		 <div class="mui-switch-handle"></div>
+		</div>
+		<div class="text_" id="pulseText">脉搏</div>
+		<div id="pulseSwitch" class="mui-switch mui-switch-blue mui-active">
+		  <div class="mui-switch-handle"></div>
+		</div>
+		<div class="text_" id="heartText">心率</div>
+		<div id="heartSwitch" class="mui-switch mui-switch-blue mui-active">
+		  <div class="mui-switch-handle"></div>
+		</div>
+	</div>
+	<div style="display: none;">
+		<canvas id="xcanvas" width="18" height="18"></canvas>
+	</div>
+	<div style="height: 80px;"></div>
+	<div  align="center" style="background-color: #F6F6F6;">
+		<canvas id="myCanvas"  height="1350">
+			您的浏览器不支持画布功能!
+		</canvas>
+	</div>
+</body>
+<script src="../script/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/mui.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="../script/Url.js" ></script>
+<script src="../script/react.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react-dom.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/babel.min.js" type="text/javascript" charset="utf-8"></script>
+<script >
+	/*//屏幕旋转时，重新加载
+    window.onorientationchange = function() { // 移动端测试有用,屏幕颠倒时
+        window.location.reload();
+    };*/
+	$(function(){
+		getDate();
+	})
+
+var isTmep = isPulse=isHeart= true;
+ document.getElementById("tempSwitch").addEventListener('toggle', function(event) {
+    isTmep=!isTmep;
+    getDate();
+});
+document.getElementById("pulseSwitch").addEventListener('toggle', function(event) {
+    isPulse=!isPulse;
+    getDate();
+});
+document.getElementById("heartSwitch").addEventListener('toggle', function(event) {
+    isHeart=!isHeart;
+    getDate();
+});
+
+function getDate(){
+	$.ajax({
+	    type: 'post',
+	   	url: Url_+'/deskNurse/doctor/getPatientHuli.do',
+	    data: {'patientid':localStorage.getItem("patientid")},
+	    dataType: "json",
+		success: function(data){
+			doTab(data);
+			$("#switch_div").css('display','block');
+		},error: function() {
+		},
+	});
+}
+
+var row = 45;//表格列数
+var headerH = 90;
+var leftBorderX = 100;//表格与左边的距离
+var hbDateH = 30;//患病日数高度
+var dateH=hbDateH;//日期高度
+var timeH = 30;//时间高度
+var tableH = 18;//主表格高度
+var tableW = 18;//主表格宽度
+var timeW=tableW;//时间宽度
+var breathH = 35;//呼吸表格的高度
+var hbDateW=tableW*6;//患病日数和日期表格宽度
+var rightTabelW=55;//右边脉搏表格的宽度
+var eventTabelH=25;//最下面事件表格的高度
+var eventTabelW = hbDateW;//最下面事件表格的宽度
+var marginTimeH = hbDateH+dateH+timeH+headerH;//表格主体开始的高度
+var tableTotalH = tableH*row;//主表格的总高度
+
+//填充脉搏短絀的斜线
+var xc = document.getElementById("xcanvas");
+var xtx = xc.getContext("2d");
+xtx.beginPath();
+xtx.strokeStyle="rgba(250,0,0,0.8)";
+xtx.lineWidth=2;
+xtx.moveTo(18,0);
+xtx.lineTo(0,18);
+xtx.stroke();
+function doTab(data)   //用来画表格的函数
+{
+	var dateEvent = data.dateEvent;
+	var timeEvent = data.timeEvent;
+	var lrhour = data.lrhour;
+	var patientInfo = data.patientInfo;
+	var timeEventLength = dateEvent.length*6;
+	var list = (timeEventLength<42?42:timeEventLength);//表格行数
+	var tableTotalW = tableW*list;//主表格的总宽度
+    var c=document.getElementById("myCanvas");
+    
+    c.width=leftBorderX+hbDateW*(dateEvent.length<7?7:dateEvent.length)+rightTabelW;
+    var ctx=c.getContext("2d");
+    
+    ctx.beginPath();
+    ctx.textAlign="center";
+    ctx.font="25px 宋体"
+    ctx.fillText(data.hospitalName,(leftBorderX+hbDateW*3.5),headerH*0.25);
+    ctx.font="30px 宋体";
+    ctx.fillText("体 温 单",(leftBorderX+hbDateW*3.5),headerH*0.6);
+    ctx.font="bold 20px 宋体";
+    ctx.textAlign="left";
+    var name="";
+    var dept_name="";
+    var bedno="";
+    var rydate="";
+    if(patientInfo){
+    	name=patientInfo.name;
+    	dept_name=patientInfo.dept_name;
+    	bedno=patientInfo.bedno;
+    	rydate=patientInfo.rydate;
+    }
+    ctx.fillText("姓名:",leftBorderX+hbDateW/3,headerH-10);
+    ctx.fillText(name,leftBorderX+hbDateW-20,headerH-10);
+    ctx.fillText("科室:",leftBorderX+hbDateW*1.7,headerH-10);
+    ctx.fillText(dept_name,leftBorderX+hbDateW*2.2,headerH-10);
+    ctx.fillText("床号:",leftBorderX+hbDateW*3.8,headerH-10);
+    ctx.fillText(bedno,leftBorderX+hbDateW*4.3,headerH-10);
+    //ctx.fillText("病人ID",leftBorderX+hbDateW*3+150,headerH-10);
+    //ctx.fillText(patientInfo.patientid,leftBorderX+hbDateW*4+110,headerH-10);
+    ctx.fillText("住院日期:",leftBorderX+hbDateW*5,headerH-10);
+    ctx.fillText(rydate,leftBorderX+hbDateW*5.9,headerH-10);
+    
+    ctx.font="bold 16px 宋体";
+    ctx.textAlign="start";
+   	ctx.fillText("患病日数",20,headerH+hbDateH/2+5);
+   	ctx.fillText("日期",leftBorderX/3,headerH+hbDateH+dateH/2+5);
+   	ctx.fillText("时间",leftBorderX/3,headerH+hbDateH+dateH+timeH/2+5);
+   	ctx.fillText("体温",leftBorderX/3,marginTimeH+tableH+5);
+   	ctx.fillText("华氏摄氏",20,marginTimeH+tableH*3+5);
+   	ctx.fillText("脉搏",leftBorderX+hbDateW*(dateEvent.length<7?7:dateEvent.length)+10,marginTimeH);
+   	ctx.fillText("脉搏",leftBorderX+tableTotalW+20,marginTimeH+tableTotalH+breathH);
+   	ctx.fillText("体温",leftBorderX+tableTotalW+20,marginTimeH+tableTotalH+breathH+eventTabelH+10);
+   	ctx.stroke();
+   	
+   	ctx.font="16px 宋体";
+	//体温摄氏值
+	var defaultCentigrade=["42","41","40","39","38","37","36","35"];
+	ctx.beginPath();
+	for(var i=0;i<defaultCentigrade.length;i++){
+        x_zuobiao=leftBorderX-23;
+        y_zuobiao=marginTimeH+tableH*5*(i+1)+5;
+        ctx.fillText(defaultCentigrade[i],x_zuobiao,y_zuobiao);
+	}
+	ctx.stroke();
+	
+	//体温华氏度
+	var defaultFdegree = ["107","106","105","104","103","102","101","100","99","98","97","96","95","94"];
+	ctx.beginPath();
+	for(var i=0;i<defaultFdegree.length;i++){
+        x_zuobiao=leftBorderX/2-37;
+        y_zuobiao=marginTimeH+tableH*5+(tableH*5/9)*3+(tableH*5/9*5)*i+5;
+        ctx.fillText(defaultFdegree[i],x_zuobiao,y_zuobiao);
+	}
+	ctx.stroke();
+	//脉搏的刻度值
+	var defaultPulse=["180","160","140","120","100","80","60","40"];
+	ctx.beginPath();
+	for(var i=0;i<defaultPulse.length;i++){
+        x_zuobiao=leftBorderX+tableTotalW+10;
+        y_zuobiao=marginTimeH+tableH*5*(i+1)+5;
+        ctx.fillText(defaultPulse[i],x_zuobiao,y_zuobiao);
+	}
+	ctx.stroke();
+	//温度刻度竖线
+	ctx.beginPath();
+	ctx.moveTo(leftBorderX/2+5,marginTimeH+tableH*5);
+	ctx.lineTo(leftBorderX/2+5,marginTimeH+tableH*43);
+	ctx.stroke();
+	//体温华氏度刻度
+	ctx.beginPath();
+	for(var i=0;i<66;i++){
+		var moveY = marginTimeH+tableH*5+(tableH*5/9)*(i+3);
+		var moveX = leftBorderX/2-2;
+		if(i%5==0){
+			moveX = leftBorderX/2-5;
+		}
+		ctx.moveTo(moveX,moveY);
+		ctx.lineTo(leftBorderX/2+5,moveY);
+	}
+	ctx.stroke();
+	//42℃的刻度线
+	ctx.beginPath();
+	ctx.moveTo(leftBorderX/2+5,marginTimeH+tableH*5);
+	ctx.lineTo(leftBorderX/2+20,marginTimeH+tableH*5)
+	ctx.stroke();
+	//患病日数表格
+    
+    for(var i=0;i<(dateEvent.length<7?7:dateEvent.length);i++)      //控制画多少行
+    {
+    	ctx.beginPath();
+        x=i*hbDateW+leftBorderX;
+        y=headerH;
+        ctx.rect(x,y,hbDateW,hbDateH);
+        ctx.stroke();
+    }
+   
+    //日期表格
+    ctx.beginPath();
+    for(var i=0;i<(dateEvent.length<7?7:dateEvent.length);i++)      //控制画多少行
+    {
+        x=i*hbDateW+leftBorderX;
+        y=headerH+dateH;
+        ctx.rect(x,y,hbDateW,dateH);
+    }
+    ctx.stroke();
+    
+    //时间表格
+    ctx.beginPath();
+    for(var r=0;r<(timeEventLength<42?42:timeEventLength);r++){
+        x=r*tableW+leftBorderX;
+        y=headerH+hbDateH+dateH;
+        x_zuobiao=x+timeW*0.5;
+        y_zuobiao=headerH+hbDateH+dateH+timeH/2+5;
+        //时间的表格
+        ctx.rect(x,y,timeW,timeH);
+    }
+    ctx.stroke();
+    
+     //右边日期同行和脉搏的表格
+    ctx.beginPath();
+    for(var r=0;r<2;r++)      
+        {
+        for(var l=0;l<1;l++)
+            {
+	            x=leftBorderX+hbDateW*(dateEvent.length<7?7:dateEvent.length);
+	            y=r*hbDateH+headerH;
+	            ctx.rect(x,y,rightTabelW,hbDateH);
+            }
+        }
+    ctx.rect(leftBorderX+hbDateW*(dateEvent.length<7?7:dateEvent.length),headerH+hbDateH*2,rightTabelW,timeH+tableTotalH);
+    ctx.stroke();
+    
+    //画主表格
+    ctx.beginPath();
+    ctx.strokeStyle="#C6CBCE";
+    for(var r=0;r<(timeEventLength<42?42:timeEventLength);r++)      
+        {
+        for(var l=0;l<row;l++)    
+            {
+	            x=r*tableW+leftBorderX;
+	            y=l*tableH+marginTimeH;
+	            ctx.rect(x,y,tableW,tableH);
+            }
+        }
+    ctx.stroke();
+
+	//画温度的加粗横线
+    ctx.beginPath();
+    ctx.lineWidth = 1;//线条的宽度
+    ctx.strokeStyle="#000000";
+    for(var i=1;i<=9;i++){
+    	 ctx.moveTo(leftBorderX,marginTimeH+(tableH*5*i));
+		 ctx.lineTo(leftBorderX+tableTotalW,marginTimeH+(tableH*5*i));
+    }
+    ctx.stroke();
+    
+    //呼吸表格
+    ctx.beginPath();
+    ctx.strokeStyle="#000000";
+    ctx.lineWidth = 1;//线条的宽度
+    for(var r=0;r<(timeEventLength<42?42:timeEventLength);r++){
+        x=r*tableW+leftBorderX;
+        y=marginTimeH+tableTotalH;
+        ctx.rect(x,y,timeW,breathH);
+    }
+    ctx.stroke();
+     //血压、体重、胃液表格
+   ctx.beginPath();
+   for(var i=0;i<11;i++){
+   		for(var j=0;j<(dateEvent.length<7?7:dateEvent.length);j++){
+   			x=leftBorderX+hbDateW*j;
+   			y=marginTimeH+tableTotalH+breathH+eventTabelH*i;
+   			ctx.rect(x,y,hbDateW,eventTabelH);
+   		}
+   }
+   ctx.rect(leftBorderX+hbDateW*(dateEvent.length<7?7:dateEvent.length),marginTimeH+tableTotalH,rightTabelW,breathH+eventTabelH*11);
+   ctx.stroke();
+   
+   //6根红色竖线，因为覆盖黑色导致颜色变成红褐色
+    ctx.beginPath();
+    ctx.strokeStyle = "#FF0000";
+    for(var i=0;i<(dateEvent.length<7?7:dateEvent.length)-1;i++){
+    	ctx.moveTo(leftBorderX+hbDateW*(i+1),marginTimeH);
+		ctx.lineTo(leftBorderX+hbDateW*(i+1),marginTimeH+tableTotalH);
+    }
+    ctx.stroke();
+    
+    ctx.textAlign="center";
+    ctx.font="16px 宋体";
+    ctx.beginPath();
+    ctx.fillStyle="#000000";
+    ctx.font="bold 16px 宋体";
+    var eventX = leftBorderX/2;
+    ctx.fillText("呼  吸",eventX,marginTimeH+tableTotalH+tableH);
+    ctx.fillText("血压(mmHg)",eventX,marginTimeH+tableTotalH+eventTabelH*2);
+    ctx.fillText("大便次数",eventX,marginTimeH+tableTotalH+eventTabelH*3);
+    ctx.fillText("体重(Kg)",eventX,marginTimeH+tableTotalH+eventTabelH*4);
+    ctx.fillText("尿量(ml)",eventX,marginTimeH+tableTotalH+eventTabelH*5);
+    ctx.fillText("输入液量(ml)",eventX,marginTimeH+tableTotalH+eventTabelH*6);
+    ctx.fillText("排出液量(ml)",eventX,marginTimeH+tableTotalH+eventTabelH*7);
+    ctx.fillText("术后天数",eventX,marginTimeH+tableTotalH+eventTabelH*8);
+    ctx.fillText("胃  液",eventX,marginTimeH+tableTotalH+eventTabelH*11);
+    ctx.stroke();
+    
+     //右下脉搏的实心红圆
+    fullYuan(ctx,leftBorderX+tableTotalW+10,marginTimeH+tableTotalH+breathH-4,5,"red");
+    //emptyYuan(ctx,leftBorderX+tableTotalW+10,marginTimeH+tableTotalH+timeH+20,5,"red");
+    //右下温度的蓝X
+    blueX(ctx,leftBorderX+tableTotalW+5,marginTimeH+tableTotalH+breathH+eventTabelH);
+    
+    
+    //患病日数
+    ctx.textAlign="center";
+    ctx.fillStyle="#000000";
+    ctx.font="16px 宋体";
+    if(dateEvent.length<7){
+    	for(var i=0;i<7;i++){
+    		x_zuobiao=leftBorderX+hbDateW*(i+0.5);
+	        y_zuobiao=headerH+hbDateH/1.5;
+	        ctx.fillText(i+1,x_zuobiao,y_zuobiao);
+    	}
+    }else{
+    	for(var i=0;i<dateEvent.length;i++)
+	    {
+	        x_zuobiao=leftBorderX+hbDateW*(i+0.5);
+	        y_zuobiao=headerH+hbDateH/1.5;
+	        if(dateEvent[i].hb_days){
+	        	ctx.fillText(dateEvent[i].hb_days,x_zuobiao,y_zuobiao);
+	        }
+	    }
+    }
+    ctx.stroke();
+    
+    //日期
+    ctx.beginPath();
+    if(dateEvent.length<7){
+    	var dated= new Date().Format("yyyy-MM-dd");
+    	var date_=[];
+    	if(dateEvent!=""){
+    		 date_=[dateEvent[0].lr_date];
+    	}else{
+    		date_ = [dated];
+    	}
+        for(var i=0;i<7;i++){
+        	x_zuobiao=leftBorderX+hbDateW*(i+0.5);
+        	y_zuobiao=headerH+hbDateH+dateH/1.5;
+        	if(i==0){
+        		if(dateEvent!=""){
+        			ctx.fillText(dateEvent[i].lr_date,x_zuobiao,y_zuobiao);
+        		}else{
+        			ctx.fillText(date_[0],x_zuobiao,y_zuobiao);
+        		}
+        	}else{
+        		date_.push(addDate(date_[i-1],1));
+        		if(date_[i].substring(0,7)!=date_[i-1].substring(0,7)){
+        			ctx.fillText(date_[i],x_zuobiao,y_zuobiao);
+        		}else{
+        			ctx.fillText(date_[i].substring(8,10),x_zuobiao,y_zuobiao);
+        		}
+        	}
+        }
+    }else{
+    	for(var i=0;i<dateEvent.length;i++)
+	    {
+	       	x_zuobiao=leftBorderX+hbDateW*(i+0.5);
+	        y_zuobiao=headerH+hbDateH+dateH/1.5;
+	        if(dateEvent[i].lr_date){
+	        	if(i==0){
+	        		ctx.fillText(dateEvent[i].lr_date,x_zuobiao,y_zuobiao);
+	        	}else{
+	        		if(dateEvent[i].lr_date.substring(0,7)!=dateEvent[i-1].lr_date.substring(0,7)){
+	        			ctx.fillText(dateEvent[i].lr_date,x_zuobiao,y_zuobiao);
+	        		}else{
+	        			ctx.fillText(dateEvent[i].lr_date.substring(8,10),x_zuobiao,y_zuobiao);
+	        		}
+	        	}
+	        }
+	    }
+    }
+    ctx.stroke();
+    
+    
+    //向时间表格中加入时间
+    ctx.beginPath();
+    for(var r=0;r<timeEventLength;r++){
+        x=r*tableW+leftBorderX;
+        y=headerH+hbDateH+dateH;
+        x_zuobiao=x+timeW*0.5;
+        y_zuobiao=headerH+hbDateH+dateH+timeH/2+5;
+        if(r%6==0||(r-4)%6==0||(r-5)%6==0){
+        	ctx.fillStyle="#FF0000";
+        }else{
+        	ctx.fillStyle="#000000";
+        }
+    	if(timeEvent[r]){
+        	ctx.fillText(timeEvent[r].hours,x_zuobiao,y_zuobiao);
+        }else{
+        	ctx.fillText(lrhour[r%6].aaa103,x_zuobiao,y_zuobiao);
+        }
+        //ctx.fillText(timeEvent[r].hours,x_zuobiao,y_zuobiao);
+    }
+    if(timeEvent.length<42){
+    	for(var i=0;i<42;i++){
+    		x=tableW*i+leftBorderX;
+	        y=headerH+hbDateH+dateH;
+	        x_zuobiao=x+timeW*0.5;
+	        y_zuobiao=headerH+hbDateH+dateH+timeH/2+5;
+	        if(i%6==0||(i-4)%6==0||(i-5)%6==0){
+	        	ctx.fillStyle="#FF0000";
+	        }else{
+	        	ctx.fillStyle="#000000";
+	        }
+	        ctx.fillText(lrhour[i%6].aaa103,x_zuobiao,y_zuobiao);
+    	}
+    }
+    ctx.stroke();
+    
+    //事件和发生时间和未测原因
+    ctx.beginPath();
+    for(var r=0;r<timeEvent.length;r++){
+        x=r*tableW+leftBorderX;
+        y=headerH+hbDateH+dateH;
+        x_zuobiao=x+timeW*0.5;
+        y_zuobiao=headerH+hbDateH+dateH+timeH/2+5;
+         //竖写当前时间的事件
+        ctx.fillStyle="#FF0000";
+        ctx.font="bold 14px 宋体";
+        var event = timeEvent[r].event;
+        var event_time = timeEvent[r].event_time;
+        var unmeasure_reason = timeEvent[r].unmeasure_reason;
+        if(typeof(event)=="undefined"){
+        }else{
+        	for(var i=0;i<event.length;i++){
+	        	var eventYZB=marginTimeH+tableH*(i+1)-5;
+	    		ctx.fillText(event[i],x_zuobiao,eventYZB);
+	        }
+        	//画破折号
+	        if(event&&event_time){
+	        	ctx.strokeStyle="#FF0000";
+	        	ctx.moveTo(leftBorderX+tableW*(r+0.5),marginTimeH+tableH*(event.length+0.4));
+	        	ctx.lineTo(leftBorderX+tableW*(r+0.5),marginTimeH+tableH*event.length+tableH*1.6);
+	        	ctx.stroke();
+	        }
+        }
+        //竖写事件的时间
+        var chn_time ="";
+    	if(event_time){
+    		var hour = event_time.substring(0,2);
+    		chn_time+=NumberToChinese(hour)+"时";
+    		var minute = event_time.substring(3,5);
+    		if(minute=="00"){
+    			chn_time+="零分";
+    		}else{
+    			chn_time+=NumberToChinese(minute)+"分";
+    		}
+    		for(var i=0;i<chn_time.length;i++){
+	        	var eventYZB=marginTimeH+tableH*(i+3+event.length)-5;
+	    		ctx.fillText(chn_time[i],x_zuobiao,eventYZB);
+	        }
+    	}
+    	
+    	if(unmeasure_reason){
+    		for(var i=0;i<unmeasure_reason.length;i++){
+    			if(event&&event_time){
+		    		unmeasureYZB=marginTimeH+tableH*(i+3+event.length+chn_time.length)-5;
+		    	}else if(event){
+		    		unmeasureYZB=marginTimeH+tableH*(i+1+event.length)-5;
+		    	}else{
+		    		unmeasureYZB=marginTimeH+tableH*(i+1)-5;
+		    	}
+	    		ctx.fillText(unmeasure_reason[i],x_zuobiao,unmeasureYZB);
+	        }
+    	}
+    }
+    ctx.stroke();
+    
+    var tempValue = [];//温度/降温后温度坐标数组
+    var pulseValue=[];//脉搏坐标数组
+    var heartrateValue=[];//心率坐标数组
+    for(var i=0;i<timeEvent.length;i++){
+    	var pulse = timeEvent[i].pulse;//脉搏的值
+     	var heartrate = timeEvent[i].heartrate;//心率的值
+     	var x_zuobiao=leftBorderX+tableW*i+timeW/2;//温度x坐标
+     	var temp = timeEvent[i].temperature;//测量的温度值
+     	var down_temperature = timeEvent[i].down_temperature;//降温后的温度值
+    	var temperature_type = timeEvent[i].temperature_type;//温度的测量类型  口温：kw;腋温：yw;肛温：gw
+        var down_x_zuobiao="";//降温后的温度x坐标
+        var down_y_zuobiao="";//降温后的温度y坐标
+     	if(temp&&temp!=0){
+     		//降温措施后的体温
+	     	if(down_temperature){
+	     		down_x_zuobiao = leftBorderX+tableW*i+tableW/2;
+	     		down_y_zuobiao = temperatureY(down_temperature);
+	     	}
+     		tempValue.push({"x_zuobiao":x_zuobiao,"y_zuobiao":temperatureY(temp),"down_x_zuobiao":down_x_zuobiao,"down_y_zuobiao":down_y_zuobiao});
+     	}
+     	
+    	if(pulse&&pulse!=0){
+    		var px_zuobiao=leftBorderX+tableW*i+tableW/2;
+    		var py_zuobiao = pulseY(pulse);
+    		pulseValue.push({"px_zuobiao":px_zuobiao,"py_zuobiao":py_zuobiao});
+    	}
+    	if(heartrate&&heartrate!=0){
+    		var heartx_zuobiao=leftBorderX+tableW*i+tableW/2;
+    		var hearty_zuobiao = pulseY(heartrate);
+    		heartrateValue.push({"heartx_zuobiao":heartx_zuobiao,"hearty_zuobiao":hearty_zuobiao});
+    	}
+    }
+   
+    if(isTmep){
+    	tempLine(ctx,tempValue);
+    	tempPoint(ctx,timeEvent);
+    }
+    if(isPulse){
+    	pulseLine(ctx,pulseValue);
+    	pulsePoint(ctx,timeEvent);
+    }
+    if(isHeart){
+    	heartLine(ctx,heartrateValue);
+    	heartPoint(ctx,timeEvent);
+    	jiaodian(ctx,pulseValue,heartrateValue);
+    }
+    
+   	
+   	//不升
+   	ctx.font="bold 16px 宋体";
+   	not_rise(ctx,timeEvent);
+   	//呼吸机
+   	breath_machine(ctx,timeEvent);
+   	//呼吸值
+   	breathValue(ctx,timeEvent);
+   	//血压
+   	blood_pressure(ctx,dateEvent);
+    //大便次数
+    shit_times(ctx,dateEvent);
+    //体重
+    weight(ctx,dateEvent);
+    //尿量
+    urine_amount(ctx,dateEvent);
+    //输入液量
+    sry_amount(ctx,dateEvent);
+    //排除液量
+    scy_amount(ctx,dateEvent);
+    //术后天数
+    shuhou_days(ctx,dateEvent);
+    //胃液
+    weiYe(ctx,dateEvent);
+}
+
+	//红色圆
+	function fullYuan(ctx,x,y,r,color){
+		ctx.beginPath();
+   	 	ctx.fillStyle=color;
+   	 	ctx.strokeStyle=color;
+    	var circle = {
+	        x : x,    //圆心的x轴坐标值
+	        y : y,    //圆心的y轴坐标值
+	        r : r      //圆的半径
+	    };
+	    ctx.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI); 
+	    ctx.fill();
+	    ctx.stroke();
+	}
+
+	//空心圆
+	function emptyYuan(ctx,x,y,r,color){
+		ctx.beginPath();
+		//ctx.fillStyle="#ffffff";
+		ctx.strokeStyle=color;
+		var circle = {
+	        x : x,    //圆心的x轴坐标值
+	        y : y,    //圆心的y轴坐标值
+	        r : r      //圆的半径
+	    };
+	    //沿着坐标点(x,y)为圆心、半径为r的圆的顺时针方向绘制弧线
+	    ctx.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI);
+	    //ctx.fill();
+	    ctx.stroke();
+	}
+	
+	//蓝色的X
+	function blueX(ctx,x,y){
+		ctx.beginPath();
+		ctx.strokeStyle="blue";
+		ctx.moveTo(x,y);
+		ctx.lineTo(x+10,y+10);
+		ctx.moveTo(x+10,y);
+		ctx.lineTo(x,y+10);
+		ctx.stroke();
+	}
+	
+	//体温的y坐标计算
+	function temperatureY(temperature){
+		var y=marginTimeH+tableH*5+(420-temperature*10)*tableH*5/10;
+		return y;
+	}
+	
+	//脉搏y坐标计算
+	function pulseY(pulse){
+		var y=marginTimeH+tableH*5+(180-pulse)*tableH/4;
+		return y;
+	}
+	
+	//体温画点
+	function tempPoint(ctx,timeEvent){
+		for(var r=0;r<timeEvent.length;r++){
+	        var x_zuobiao=leftBorderX+tableW*r+timeW/2;//温度x坐标
+	     	var temp = timeEvent[r].temperature;//测量的温度值
+	     	var down_temperature = timeEvent[r].down_temperature;//降温后的温度值
+	     	var temperature_type = timeEvent[r].temperature_type;//温度的测量类型  口温：kw;腋温：yw;肛温：gw
+	     	//温度和降温措施后温度画点
+	     	if(temp&&temp!=0){
+	     		//口温
+	     		if("kw"==temperature_type){
+	     			fullYuan(ctx,x_zuobiao,temperatureY(temp),3,"blue");
+		     	}
+	     		//肛温
+		     	if("gw"==temperature_type){
+		     		emptyYuan(ctx,x_zuobiao,temperatureY(temp),5,"blue");
+		     	}
+		     	//腋温
+		     	if("yw"==temperature_type){
+		     		blueX(ctx,x_zuobiao-tableW/4,temperatureY(temp)-tableH/4);
+	     		}
+		     	//降温措施后的体温
+		     	if(down_temperature){
+		     		emptyYuan(ctx,x_zuobiao,temperatureY(down_temperature),4,"red");
+		     	}
+	     	}
+	   }
+	}
+	
+	//体温连线
+	function tempLine(ctx,tempValue){
+	    for(var i=0;i<tempValue.length;i++){
+	    	//体温连线
+	    	if(i>=1){
+	    		ctx.beginPath();
+				ctx.strokeStyle="blue";
+				ctx.setLineDash([0,0,0]);
+	    		ctx.moveTo(tempValue[i-1].x_zuobiao,tempValue[i-1].y_zuobiao);
+	    		ctx.lineTo(tempValue[i].x_zuobiao,tempValue[i].y_zuobiao);
+	    		ctx.stroke();
+	    	}
+	    	//如果有降温，当前时间体温和降温用红色虚线连接
+	    	if(tempValue[i].down_x_zuobiao!=""&&tempValue[i].down_y_zuobiao!=""){
+    			ctx.beginPath();
+	    		ctx.strokeStyle="#FF0000";
+	    		ctx.setLineDash([5,5,5]);
+	    		ctx.moveTo(tempValue[i].x_zuobiao,tempValue[i].y_zuobiao);
+	    		ctx.lineTo(tempValue[i].down_x_zuobiao,tempValue[i].down_y_zuobiao);
+	    		ctx.stroke();
+    		}
+	    }
+	}
+	
+	//脉搏画点
+	function pulsePoint(ctx,timeEvent){
+		 	var x_zuobiao,temp,temperature_type,pulse,heartrate;
+		for(var r=0;r<timeEvent.length;r++){
+	         x_zuobiao=leftBorderX+tableW*r+timeW/2;//温度x坐标
+	         temp = timeEvent[r].temperature;
+	         temperature_type = timeEvent[r].temperature_type;
+	     	 pulse = timeEvent[r].pulse;//脉搏的值
+	     	 heartrate = timeEvent[r].heartrate;//心率的值
+	     	//脉搏画点
+	     	if(pulse!=""&&pulse!=0&&typeof(pulse)!="undefined"){
+	    		var px_zuobiao=leftBorderX+tableW*r+tableW/2;//温度x坐标
+	    		var py_zuobiao = pulseY(pulse);
+	    		//脉搏的点和温度点重合
+	    		if(x_zuobiao==px_zuobiao&&temperatureY(temp)==py_zuobiao&&isTmep){
+	    			if(temperature_type=="kw"){
+	    				emptyYuan(ctx,px_zuobiao,py_zuobiao,5,"red");
+	    			}
+	    			if(temperature_type=="gw"){
+	    				fullYuan(ctx,px_zuobiao,py_zuobiao,3,"red");
+	    			}
+	    			if(temperature_type=="yw"){
+	    				emptyYuan(ctx,px_zuobiao,py_zuobiao,5,"red");
+	    			}
+	    		}else{
+	    			fullYuan(ctx,px_zuobiao,py_zuobiao,3,"red");
+	    		}
+	    	}
+	    }
+	}
+	
+	//脉搏连线
+	function pulseLine(ctx,pulseValue){
+		for(var i=0;i<pulseValue.length;i++){
+	    	if(i>=1){
+	    		ctx.beginPath();
+				ctx.strokeStyle="#FF0000";
+	    		ctx.moveTo(pulseValue[i-1].px_zuobiao,pulseValue[i-1].py_zuobiao);
+	    		ctx.lineTo(pulseValue[i].px_zuobiao,pulseValue[i].py_zuobiao);
+	    		ctx.stroke();
+	    	}
+	    }
+	}
+	
+	//心率画点
+	function heartPoint(ctx,timeEvent){
+		for(var r=0;r<timeEvent.length;r++){
+	        var x_zuobiao=leftBorderX+tableW*r+timeW/2;//温度x坐标
+	     	var heartrate = timeEvent[r].heartrate;//心率的值
+	     	//心率画点
+	     	if(heartrate!=""&&heartrate!=0&&typeof(heartrate)!="undefined"){
+	    		var heartx_zuobiao=leftBorderX+tableW*r+tableW/2;
+	    		var hearty_zuobiao = pulseY(heartrate);
+	    		//脉搏的点和温度点重合
+	    		emptyYuan(ctx,heartx_zuobiao,hearty_zuobiao,6,"red");
+	    	}
+	    }
+	}
+	
+	//心率连线
+	function heartLine(ctx,heartValue){
+		for(var i=0;i<heartValue.length;i++){
+	    	if(i>=1){
+	    		ctx.beginPath();
+				ctx.strokeStyle="#FF0000";
+	    		ctx.moveTo(heartValue[i-1].heartx_zuobiao,heartValue[i-1].hearty_zuobiao);
+	    		ctx.lineTo(heartValue[i].heartx_zuobiao,heartValue[i].hearty_zuobiao);
+	    		ctx.stroke();
+	    	}
+	    }
+	}
+	
+	//体温不升
+	function not_rise(ctx,timeEvent){
+		for(var i=0;i<timeEvent.length;i++){
+			ctx.fillStyle="blue"; 
+			if(timeEvent[i].not_rise=="1"){
+				ctx.beginPath();
+				var x_ = leftBorderX+tableW*(i+0.5);
+				var text = "不升";
+		    	for(var j=0;j<text.length;j++){
+		    		var eventYZB=marginTimeH+tableH*(41+j)-tableH/4;
+		    		ctx.fillText(text[j],x_,eventYZB);
+		    	}
+		    	ctx.stroke();
+			}
+	    }
+	}
+	
+	//辅助呼吸机
+	function breath_machine(ctx,timeEvent){
+		var breFlag=0;
+		for(var i=0;i<timeEvent.length;i++){
+			//开始使用呼吸机
+   			if(timeEvent[i].breath_machine==2){
+				ctx.beginPath();
+				var x_ = leftBorderX+tableW*(i+0.5);
+				var text = "呼吸机";
+		    	for(var j=0;j<text.length;j++){
+		    		var eventYZB=marginTimeH+tableH*(43+j)-tableH/4;
+		    		ctx.fillText(text[j],x_,eventYZB);
+	    			ctx.stroke();
+		    	}
+			}
+   			//使用呼吸机
+   			if(timeEvent[i].breath_machine==1){
+   				//使用呼吸机，第一次开始使用用↑,其它的用呼吸机频率(病人呼吸同呼吸机频率)
+   				if(i>0){
+   					//当前时刻和上一时刻都是使用呼吸机,当前时刻写上呼吸机频率
+   					if(timeEvent[i-1].breath_machine==timeEvent[i].breath_machine){
+	   					var breath_x = leftBorderX+tableW*(i+0.5);
+			   			if(breFlag%2==0){
+			   			    breath_y = marginTimeH+tableH*42.75;
+			   			    breFlag+=1;
+			   			}else{
+			   				breath_y=marginTimeH+tableH*44.75;
+			   				breFlag+=1;
+			   			}
+			   			if(timeEvent[i].breath){
+			   				ctx.fillText(timeEvent[i].breath==0?"":timeEvent[i].breath,breath_x,breath_y);
+			   			}
+	   				}else{
+	   					ctx.beginPath();
+			    		ctx.strokeStyle="blue";
+		    			ctx.fillStyle="blue";
+		    			ctx.moveTo(leftBorderX+tableW*i,marginTimeH+tableH*42.7);
+		    			ctx.lineTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*42.2);
+		    			ctx.lineTo(leftBorderX+tableW*(i+1),marginTimeH+tableH*42.7);
+		    			ctx.fill();
+			    		ctx.moveTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*42.5);
+			    		ctx.lineTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*44.5);
+			    		ctx.stroke();
+			    		breFlag+=1;
+	   				}
+   				}else{
+   					//第一次使用呼吸机用↑箭头表示
+   					ctx.beginPath();
+		    		ctx.strokeStyle="blue";
+	    			ctx.fillStyle="blue";
+	    			ctx.moveTo(leftBorderX+tableW*i,marginTimeH+tableH*42.7);
+	    			ctx.lineTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*42.2);
+	    			ctx.lineTo(leftBorderX+tableW*(i+1),marginTimeH+tableH*42.7);
+	    			ctx.fill();
+		    		ctx.moveTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*42.5);
+		    		ctx.lineTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*44.5);
+		    		ctx.stroke();
+		    		breFlag+=1;
+   				}
+	    	}
+   			//结束使用呼吸机
+   			if(timeEvent[i].breath_machine==3){
+   				ctx.beginPath();
+	    		ctx.strokeStyle="blue";
+    			ctx.fillStyle="blue";
+    			ctx.moveTo(leftBorderX+tableW*i,marginTimeH+tableH*44.3);
+    			ctx.lineTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*44.8);
+    			ctx.lineTo(leftBorderX+tableW*(i+1),marginTimeH+tableH*44.3);
+    			ctx.fill();
+    			ctx.moveTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*42.5);
+	    		ctx.lineTo(leftBorderX+tableW*(i+0.5),marginTimeH+tableH*44.5);
+	    		ctx.stroke();
+	    		breFlag+=1;
+	    	}
+   		}
+	}
+	
+	//呼吸值
+	function breathValue(ctx,timeEvent){
+		ctx.beginPath();
+	   	var breath_y="";
+	   	var flag=0;
+	   	for(var i=0;i<timeEvent.length;i++){
+	   		if(timeEvent[i].breath&&timeEvent[i].breath!=0){
+	   			var breath_x = leftBorderX+tableW*(i+0.5);
+	   			if(flag%2==0){
+	   			    breath_y = marginTimeH+tableTotalH+breathH/2;
+	   			    flag+=1;
+	   			}else{
+	   				breath_y=marginTimeH+tableTotalH+breathH-breathH/5;
+	   				flag+=1;
+	   			}
+	   			ctx.fillText(timeEvent[i].breath,breath_x,breath_y);
+	   		}
+	   	}
+	   	ctx.stroke();
+	}
+	
+	//血压
+	function blood_pressure(ctx,dateEvent){
+		ctx.beginPath();
+	   	ctx.font="17px 宋体";
+	   	ctx.fillStyle="#000000";
+	   	ctx.textAlign="center";
+	   	for(var i=0;i<dateEvent.length;i++){
+	   		var blood_text="";
+	   		var blood_not_reason = dateEvent[i].xy_not_reason;
+	   		var blood_pressure=dateEvent[i].bloodpressure;
+	   		if(dateEvent[i].bloodpressure){
+	   			blood_text = blood_pressure;
+	   		}
+	   		if(blood_not_reason){
+	   			blood_text=blood_not_reason;
+	   		}
+	   		var blood_x = leftBorderX+eventTabelW*(i+0.5);
+   			var blood_y=marginTimeH+tableTotalH+breathH+eventTabelH*0.75;
+   			ctx.fillText(blood_text,blood_x,blood_y);
+	   	}
+	   	ctx.stroke();
+	}
+	
+	//大便次数
+	function shit_times(ctx,dateEvent){
+		ctx.beginPath();
+	   	for(var i=0;i<dateEvent.length;i++){
+	   		if(dateEvent[i].shit_times){
+	   			var shit_x = leftBorderX+eventTabelW*(i+0.5);
+	   			var shit_y=marginTimeH+tableTotalH+breathH+eventTabelH*1.75;
+	   			ctx.fillText(dateEvent[i].shit_times,shit_x,shit_y);
+	   		}
+	   	}
+	   	ctx.stroke();
+	}
+	//体重
+	function weight(ctx,dateEvent){
+		ctx.beginPath();
+	   	for(var i=0;i<dateEvent.length;i++){
+	   		var weight_text="";
+	   		var weight_not_reason = dateEvent[i].weight_not_reason;
+	   		var weight = dateEvent[i].weight;
+	   		if(dateEvent[i].weight){
+	   			weight_text=weight
+	   		}
+	   		
+	   		if(weight_not_reason!=""&&typeof(weight_not_reason)!="undefined"){
+	   			weight_text=weight_not_reason
+	   		}
+   			var weight_x = leftBorderX+eventTabelW*(i+0.5);
+   			var weight_y=marginTimeH+tableTotalH+breathH+eventTabelH*2.75;
+   			ctx.fillText(weight_text,weight_x,weight_y);
+	   	}
+	   	ctx.stroke();
+	}
+	//尿量
+	function urine_amount(ctx,dateEvent){
+		ctx.beginPath();
+	   	for(var i=0;i<dateEvent.length;i++){
+	   		if(dateEvent[i].urine_amount){
+	   			var urine_amount_x = leftBorderX+eventTabelW*(i+0.5);
+	   			var urine_amount_y=marginTimeH+tableTotalH+breathH+eventTabelH*3.75;
+	   			ctx.fillText(dateEvent[i].urine_amount,urine_amount_x,urine_amount_y);
+	   		}
+	   	}
+	   	ctx.stroke();
+	}
+	//输入液量
+	function sry_amount(ctx,dateEvent){
+		ctx.beginPath();
+	   	for(var i=0;i<dateEvent.length;i++){
+	   		if(dateEvent[i].sry_amount){
+	   			var sry_amount_x = leftBorderX+eventTabelW*(i+0.5);
+	   			var sry_amount_y=marginTimeH+tableTotalH+breathH+eventTabelH*4.75;
+	   			ctx.fillText(dateEvent[i].sry_amount,sry_amount_x,sry_amount_y);
+	   		}
+	   	}
+	   	ctx.stroke();
+	}
+	//输出液量
+	function scy_amount(ctx,dateEvent){
+		ctx.beginPath();
+	   	for(var i=0;i<dateEvent.length;i++){
+	   		if(dateEvent[i].scy_amount){
+	   			var scy_amount_x = leftBorderX+eventTabelW*(i+0.5);
+	   			var scy_amount_y=marginTimeH+tableTotalH+breathH+eventTabelH*5.75;
+	   			ctx.fillText(dateEvent[i].scy_amount,scy_amount_x,scy_amount_y);
+	   		}
+	   	}
+	   	ctx.stroke();
+	}
+	//术后天数
+	function shuhou_days(ctx,dateEvent){
+		ctx.beginPath();
+	   	for(var i=0;i<dateEvent.length;i++){
+	   		if(dateEvent[i].shuhou_days){
+	   			var shuhou_x = leftBorderX+eventTabelW*(i+0.5);
+	   			var shuhou_y=marginTimeH+tableTotalH+breathH+eventTabelH*6.75;
+	   			ctx.fillText(dateEvent[i].shuhou_days,shuhou_x,shuhou_y);
+	   		}
+	   	}
+	   	ctx.stroke();
+	}
+	//胃液
+	function weiYe(ctx,dateEvent){
+		ctx.beginPath();
+	   	for(var i=0;i<dateEvent.length;i++){
+	   		if(dateEvent[i].weiye){
+	   			var weiye_x = leftBorderX+eventTabelW*(i+0.5);
+	   			var weiye_y=marginTimeH+tableTotalH+breathH+eventTabelH*9.75;
+	   			ctx.fillText(dateEvent[i].weiye,weiye_x,weiye_y);
+	   		}
+	   	}
+	   	ctx.stroke();
+	}
+	
+	function jiaodian(ctx,pulseValue,heartrateValue){
+		var pd=[];
+		var hd=[];
+		var jd = [];//交点的坐标 
+		for(var i=1;i<heartrateValue.length;i++){
+			for(var j=1;j<pulseValue.length;j++){
+				//两条线有交点
+				if(segmentsIntr(pulseValue[j-1],pulseValue[j],heartrateValue[i-1],heartrateValue[i])){
+					jd.push(segmentsIntr(pulseValue[j-1],pulseValue[j],heartrateValue[i-1],heartrateValue[i]));
+					pd.push(j);
+					hd.push(i);
+				}
+				//脉搏和心率点重合
+				if(pulseValue[j].px_zuobiao==heartrateValue[i].heartx_zuobiao&&pulseValue[j].py_zuobiao==heartrateValue[i].hearty_zuobiao){
+					jd.push({x:pulseValue[j].px_zuobiao,y:pulseValue[j].py_zuobiao});
+					pd.push(j);
+					hd.push(i);
+				}
+			}
+		}
+		if(isPulse&&isHeart){
+			if(jd.length>0){
+				for(var i=0;i<jd.length;i++){
+					ctx.beginPath();
+					ctx.strokeStyle="red";
+					var pt = ctx.createPattern(xc,'repeat');
+					ctx.fillStyle = pt;
+					ctx.moveTo(jd[i].x,jd[i].y);
+					for(var d=pd[i];d<pd[i+1];d++){
+						ctx.lineTo(pulseValue[d].px_zuobiao,pulseValue[d].py_zuobiao);
+					}
+					if(jd[i+1]){
+						ctx.lineTo(jd[i+1].x,jd[i+1].y);
+					}
+					if(hd[i+1]){
+						for(var h=hd[i+1]-1;h>=hd[i];h--){
+							ctx.lineTo(heartrateValue[h].heartx_zuobiao,heartrateValue[h].hearty_zuobiao);
+						}
+					}
+					ctx.fill();
+					ctx.stroke();
+				}
+			}
+		}
+	}
+	//计算两条连线是否相交
+	function segmentsIntr(a, b, c, d){
+	    var area_abc = (a.px_zuobiao - c.heartx_zuobiao) * (b.py_zuobiao - c.hearty_zuobiao) - (a.py_zuobiao - c.hearty_zuobiao) * (b.px_zuobiao - c.heartx_zuobiao);  
+	    var area_abd = (a.px_zuobiao - d.heartx_zuobiao) * (b.py_zuobiao - d.hearty_zuobiao) - (a.py_zuobiao - d.hearty_zuobiao) * (b.px_zuobiao - d.heartx_zuobiao);   
+	    if ( area_abc*area_abd>=0 ) {
+	        return false;  
+	    }  
+	    var area_cda = (c.heartx_zuobiao - a.px_zuobiao) * (d.hearty_zuobiao - a.py_zuobiao) - (c.hearty_zuobiao - a.py_zuobiao) * (d.heartx_zuobiao - a.px_zuobiao);  
+	    var area_cdb = area_cda + area_abc - area_abd ;  
+	    if (  area_cda * area_cdb >= 0 ) {  
+	        return false;  
+	    }
+	    var t = area_cda / ( area_abd- area_abc );  
+	    var dx= t*(b.px_zuobiao - a.px_zuobiao),  
+	        dy= t*(b.py_zuobiao - a.py_zuobiao);  
+	    return { x: a.px_zuobiao + dx , y: a.py_zuobiao + dy };  
+	}
+	
+	var chnNumChar = ["零","一","二","三","四","五","六","七","八","九"];
+	var chnUnitSection = ["","万","亿","万亿","亿亿"];
+	var chnUnitChar = ["","十","百","千"];
+	function SectionToChinese(section){
+	  var strIns = '', chnStr = '';
+	  var unitPos = 0;
+	  var zero = true;
+	  while(section > 0){
+	    var v = section % 10;
+	    if(v === 0){
+	      if(!zero){
+	        zero = true;
+	        chnStr = chnNumChar[v] + chnStr;
+	      }
+	    }else{
+	      zero = false;
+	      strIns = chnNumChar[v];
+	      strIns += chnUnitChar[unitPos];
+	      chnStr = strIns + chnStr;
+	    }
+	    unitPos++;
+	    section = Math.floor(section / 10);
+	  }
+	  return chnStr;
+	}
+	//数字转中文
+	function NumberToChinese(num){
+	  var unitPos = 0;
+	  var strIns = '', chnStr = '';
+	  var needZero = false;
+	  if(num === 0){
+	    return chnNumChar[0];
+	  }
+	  while(num > 0){
+	    var section = num % 10000;
+	    if(needZero){
+	      chnStr = chnNumChar[0] + chnStr;
+	    }
+	    strIns = SectionToChinese(section);
+	    strIns += (section !== 0) ? chnUnitSection[unitPos] : chnUnitSection[0];
+	    chnStr = strIns + chnStr;
+	    needZero = (section < 1000) && (section > 0);
+	    num = Math.floor(num / 10000);
+	    unitPos++;
+	  }
+	  return chnStr;
+	}
+	
+	 function addDate(date, days) {
+            if (days == undefined || days == '') {
+                days = 1;
+            }
+            var date = new Date(date);
+            date.setDate(date.getDate() + days);
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            return date.getFullYear() + '-' + getFormatDate(month) + '-' + getFormatDate(day);
+        }
+
+        // 日期月份/天的显示，如果是1位数，则在前面加上'0'
+        function getFormatDate(arg) {
+            if (arg == undefined || arg == '') {
+                return '';
+            }
+            var re = arg + '';
+            if (re.length < 2) {
+                re = '0' + re;
+            }
+            return re;
+        }
+        
+        Date.prototype.Format = function (fmt) {
+		    var o = {
+		        "M+": this.getMonth() + 1, //月份 
+		        "d+": this.getDate(), //日 
+		        "h+": this.getHours(), //小时 
+		        "m+": this.getMinutes(), //分 
+		        "s+": this.getSeconds(), //秒 
+		        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+		        "S": this.getMilliseconds() //毫秒 
+		    };
+		    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+		    for (var k in o)
+		    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+		    return fmt;
+		}
+</script>
+</body>
+</html>

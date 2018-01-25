@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>登录</title>
+		<link rel="stylesheet" type="text/css" href="css/mui.min.css" />
+		<style type="text/css">
+			#sure {
+				width: 100%;
+				height: 5rem;
+				background: #0FA1FF;
+				border-color: #0FA1FF;
+				color: #FFF;
+				font-size: 1.75rem;
+				border-radius: 2.5rem;
+			}
+			
+			.login-header {
+				width: 100%;
+				height: 22rem;
+				background: no-repeat url(image/login/bg2.png);
+				background-size: cover;
+			}
+			
+			.app-title {
+				color: #FFF;
+				font-size: 3rem;
+				width: 20rem;
+				margin: 0 auto;
+				text-align: center;
+				padding-top: 4rem;
+			}
+			
+			.app-logo {
+				width: 11.2rem;
+				height: 10.5rem;
+				background: no-repeat url(image/login/logo.png);
+				margin: 4rem auto;
+			}
+			
+			.input-div {
+				width: 50%;
+				margin: 2rem auto;
+			}
+			
+			.input-box {
+				background: #FFF;
+				height: 4.4rem;
+				border-radius: 2.2rem;
+			}
+			
+			.input-box>div:first-child {
+				float: left;
+				width: 12%;
+			}
+			
+			.input-box>div:nth-child(2) {
+				float: left;
+				width: 78%;
+			}
+			
+			.input-box>div:last-child {
+				float: left;
+				width: 10%;
+			}
+			
+			.img-label {
+				width: 2rem;
+				height: 2rem;
+				margin: 1.2rem auto;
+			}
+			
+			.img-label.user-img {
+				background: no-repeat url(image/login/user.png);
+				background-size: cover;
+			}
+			
+			.img-label.pwd-img {
+				background: no-repeat url(image/login/lock.png);
+				background-size: cover;
+			}
+			
+			input[type="text"] {
+				width: 100%;
+				height: 4rem;
+				border: none;
+				font-size: 2rem;
+				color: #666;
+				text-align: center;
+				margin-top: 0.2rem;
+			}
+			
+			input[type="password"] {
+				width: 100%;
+				height: 4rem;
+				border: none;
+				font-size: 2rem;
+				color: #999;
+				text-align: center;
+				margin-top: 0.2rem;
+			}
+			
+			.icon-clear {
+				width: 2rem;
+				height: 2rem;
+				background: rgba(187, 187, 187, .6);
+				text-align: center;
+				border-radius: 1rem;
+				padding-top: 0.2rem;
+				margin-top: 1.2rem;
+				margin-left: 30%;
+				display: none;
+			}
+			
+			@media only screen and (max-width: 1279px) {
+				.login-header {
+					height: 34rem;
+					background: no-repeat url(image/login/bg.png);
+				}
+				.app-title {
+					padding-top: 10rem;
+				}
+				.app-logo {
+					width: 11.2rem;
+					height: 10.5rem;
+					background: no-repeat url(image/login/logo.png);
+					margin: 9rem auto;
+				}
+				.input-div {
+					width: 80%;
+					margin: 2rem auto;
+				}
+			}
+		</style>
+	</head>
+
+	<body style="background: #F3F3F3;">
+		<div class="login-header">
+			<div class="app-title">医生助手</div>
+			<div class="app-logo" id="applogo"></div>
+		</div>
+		<div class="input-div input-box">
+			<div>
+				<div class="img-label user-img"></div>
+			</div>
+			<div>
+				<input id="loginid" type="text" value="">
+			</div>
+			<div>
+				<div class="icon-clear">
+					<span class="mui-icon mui-icon-closeempty"></span>
+				</div>
+			</div>
+		</div>
+		<div class="input-div input-box">
+			<div>
+				<div class="img-label pwd-img">
+					<div class="img-label pwd-img"></div>
+				</div>
+			</div>
+			<div>
+				<input id="password" type="password" value="">
+			</div>
+			<div>
+				<div class="icon-clear">
+					<span class="mui-icon mui-icon-closeempty"></span>
+				</div>
+			</div>
+		</div>
+		<div class="input-div">
+			<button id="sure">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+		</div>
+
+		<div id="selectDept" style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;z-index: 10;
+			background:#F6F6F6;display: none;opacity: 0;padding-top: 20%;">
+			<div style="width: 78%;margin: 0 auto;background: #FBFBFB;border-radius: 0.5rem;
+				border: 1px solid #0FA1FF;">
+				<ul class="mui-table-view" id="deptul">
+				</ul>
+			</div>
+		</div>
+
+		<div id="logining" style="position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: 10;
+			background:#F6F6F6;display: none;padding-top: 20%;">
+			<div style="text-align: center;color: #999;font-size: 2rem;">
+				我正努力为您加载。。。
+			</div>
+		</div>
+		
+		<div id="downloading" style="position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: 10;
+			background:#F6F6F6;display: none;padding-top: 20%;">
+			<div style="text-align: center;color: #999;font-size: 2rem;">
+				下载中。。。
+			</div>
+		</div>
+		
+		<div id="serviceipdiv" style="height: 10rem;width: 80%;background: #F6F6F6;position: fixed;left: 10%;
+			bottom: 4.5rem;z-index: 10;border-radius:10px ;padding: 2rem 0.5rem;display: none;">
+			<input id='serviceip' type="text" class="mui-input-clear mui-input" placeholder="请输入服务器IP">
+			<button id="btnSave" class="mui-btn mui-btn-block mui-btn-primary">保存</button>
+		</div>
+		
+	</body>
+
+</html>
+<script src="script/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/zepto.fx.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/common.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/mui.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="script/Url.js"></script>
+<script type="text/javascript" src="script/checkVerison.js"></script>
+<script>
+	mui.init({
+		gestureConfig:{
+			longtap: true //默认为false
+		}
+	});
+	
+	
+	
+	document.getElementById('applogo').addEventListener('longtap',function(event){
+		$('#serviceip').val(localStorage.getItem("serviceip"))
+    	$('#serviceipdiv').show();
+    });
+	
+	$('#btnSave').bind('tap', function() {
+		localStorage.setItem("serviceip",$('#serviceip').val());
+		$('#serviceipdiv').hide();
+	});
+	mui.plusReady(function() {
+		var l_loginid = localStorage.getItem("loginid");
+		var l_password = localStorage.getItem("password");
+		if(l_loginid&&l_password){
+			$('#loginid').val(l_loginid);
+			$('#password').val(l_password);
+		}
+		$("#sure").on('tap', function() {
+			loginTap();
+		});
+	});
+
+	$('input').on('focus', function() {
+		if($(this).val()) {
+			$(this).parent().next().children().show();
+		}
+	});
+
+	$('input').on('blur', function() {
+		$(this).parent().next().children().hide();
+	});
+
+	$('input').on('keyup', function() {
+		if($(this).val()) {
+			$(this).parent().next().children().show();
+		} else {
+			$(this).parent().next().children().hide();
+		}
+	});
+
+	$('.icon-clear').on('tap', function() {
+		$(this).parent().prev().children().val('');
+		$(this).hide();
+	});
+	function loginTap(){
+		if(Url_=="http://null"){
+			Url_="http://"+localStorage.getItem("serviceip");
+		}
+		var reqUrl = Url_ + "/deskNurse/desk/checkVersion.do";
+		var appVersion;
+		plus.runtime.getProperty(plus.runtime.appid, function(inf) {
+			appVersion = inf.version;
+			$.ajax({
+				type: 'POST',
+				url: reqUrl,
+				data: {
+					'appVersion': appVersion,'type':'2'
+				},
+				dataType: "json",
+				async: false,
+				success: function(data) {
+					if(data.update) {
+						var btnArray = ['否', '是'];
+						mui.confirm('确认下载升级包', '有新版本可更新', btnArray, function(e) {
+							if(e.index == 1) {
+								downloadApp(Url_, data.versionCode);
+							}else{
+								return;
+							}
+						})
+					} else {
+						var loginid = Zepto("#loginid").val();
+						var password = Zepto("#password").val();
+						$.ajax({
+							type: 'POST',
+							url: Url_ + '/deskNurse/app/login.do',
+							data: {
+								"loginid": loginid,
+								"password": password
+							},
+							dataType: 'json',
+							success: function(data) {
+								localStorage.setItem("loginid",loginid);
+								localStorage.setItem("password",password);
+								if(data.result == "success") {
+									g_loginid = loginid;
+									g_name = data.name;
+									loginSuccess(loginid);
+								} else {
+									mui.toast(data.msg);
+								}
+							},
+							error:   function(e)  {
+
+							}
+						});
+					}
+				}
+			});
+		});
+	}
+
+	var g_loginid;
+	var g_name;
+	var g_dept;
+	var g_deptid;
+
+	function loginSuccess(loginid) {
+		localStorage.setItem('islogin', true);
+		//检查是否有多个科室
+		$.ajax({
+			type: 'POST',
+			url: Url_ + '/deskNurse/doctor/getDeptByEmp.do',
+			data: {
+				empid: loginid
+			},
+			dataType: 'json',
+			success: function(data) {
+				if(data.length > 1) {
+					showDepts(data);
+					return;
+				}
+
+				if(data.length == 1) {
+					openIndex(data[0].deptid, data[0].dept);
+				}
+
+				if(data.length == 0) {
+					mui.toast("没有科室权限，请联系管理员");
+					return;
+				}
+			}
+		});
+	}
+
+	function showDepts(dept) {
+		$('#deptul').empty();
+		for(var i = 0; i < dept.length; i++) {
+			var li = '<li onclick="openIndex(\'' + dept[i].deptid + '\',\'' + dept[i].dept + '\')" class="mui-table-view-cell" style="font-size:1.75rem;line-height:2.5rem;height:4rem;text-align: center;color: #0FA3E5;">' +
+				dept[i].dept + '</li>';
+			$('#deptul').append(li);
+		}
+
+		$("#selectDept").fadeIn();
+	}
+
+	function openIndex(deptid, dept) {
+		g_dept = dept;
+		g_deptid = deptid;
+
+		$("#selectDept").hide();
+
+		$('#logining').show();
+		var page = mui.preload({
+			url: 'index.html',
+			id: 'index',
+			extras: {
+				deptid: g_deptid,
+				dept: g_dept,
+				name: g_name,
+				loginid: g_loginid
+			}
+		});
+		setTimeout(function() {
+			mui.openWindow({
+				url: 'index.html',//改成index
+				id: 'index',
+				extras: {
+					deptid: g_deptid,
+					dept: g_dept,
+					name: g_name,
+					loginid: g_loginid
+				}
+			});
+			setTimeout(function() {
+				$('#logining').hide();
+			}, 1000);
+		}, 400);
+	}
+	$(document).keydown(function (event) {
+		//键盘的开始键
+        if (event.keyCode == 13) {
+        	document.activeElement.blur();
+        	loginTap();
+        }
+    });
+</script>

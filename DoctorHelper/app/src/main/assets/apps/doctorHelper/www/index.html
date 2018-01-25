@@ -1,0 +1,773 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>首页</title>
+		<link rel="stylesheet" type="text/css" href="css/mui.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/shouye.css" />
+
+		<style type="text/css">
+			.input-div {
+				width: 50%;
+				margin: 2rem auto;
+			}
+			
+			.input-box {
+				background: #FFF;
+				height: 4.4rem;
+				border-radius: 2.2rem;
+			}
+			
+			.input-box>div:first-child {
+				float: left;
+				width: 12%;
+			}
+			
+			.input-box>div:nth-child(2) {
+				float: left;
+				width: 78%;
+			}
+			
+			.input-box>div:last-child {
+				float: left;
+				width: 10%;
+			}
+			
+			.img-label {
+				width: 2rem;
+				height: 2rem;
+				margin: 1.2rem auto;
+			}
+			
+			.img-label.user-img {
+				background: no-repeat url(image/login/user.png);
+				background-size: cover;
+			}
+			
+			.img-label.pwd-img {
+				background: no-repeat url(image/login/lock.png);
+				background-size: cover;
+			}
+			
+			input[type="text"] {
+				width: 100%;
+				height: 4rem;
+				border: none;
+				font-size: 2rem;
+				color: #666;
+				text-align: center;
+				margin-top: 0.2rem;
+			}
+			
+			input[type="password"] {
+				width: 100%;
+				height: 4rem;
+				border: none;
+				font-size: 2rem;
+				color: #999;
+				text-align: center;
+				margin-top: 0.2rem;
+			}
+			
+			.icon-clear {
+				width: 2rem;
+				height: 2rem;
+				background: rgba(187, 187, 187, .6);
+				text-align: center;
+				border-radius: 1rem;
+				padding-top: 0.2rem;
+				margin-top: 1.2rem;
+				margin-left: 30%;
+				display: none;
+			}
+			
+			#sure {
+				width: 100%;
+				height: 5rem;
+				background: #0FA1FF;
+				border-color: #0FA1FF;
+				color: #FFF;
+				font-size: 1.75rem;
+				border-radius: 2.5rem;
+			}
+			
+			@media only screen and (max-width: 1279px) {
+				.input-div {
+					width: 80%;
+					margin: 2rem auto;
+				}
+				#modifyPasswordWraper {
+					margin-top: 10%;
+				}
+			}
+		</style>
+
+	</head>
+
+	<body>
+		<header id='header' class="mui-bar mui-bar-nav">
+			<div class="mui-row" id="headerbox">
+				<div id="doctorInfo" class="mui-col-sm-2" style="padding-left: 1rem; width: 25%;">
+					<span id="empname"></span>
+					<span id="dept"></span>
+				</div>
+				<div id="seachBox" class="mui-col-sm-9" style="width: 60%;">
+					<div class="mui-input-row mui-search">
+						<input id="search" type="search" class="mui-input-clear" placeholder="姓名/住院号/床号">
+					</div>
+				</div>
+				<div id="btnSet" class="mui-col-sm-1" style="text-align: right;padding-right: 1rem;width: 15%;">
+					<span class="mui-icon setting"></span>
+				</div>
+			</div>
+			<!-- 医嘱类型选择 -->
+			<div class="setClass">
+				<div id="deptBtn">切换科室</div>
+				<div id="mdfpwdBtn">修改密码</div>
+				<div id="updateBtn">检查更新</div>
+				<div id="logoutBtn">退出</div>
+			</div>
+		</header>
+		<nav id="navFooter" class="mui-bar mui-bar-tab footer">
+			<a class="mui-tab-item mui-active" type="all">
+				<span class="mui-icon p-all"></span>
+				<span class="mui-tab-label">全部病人</span>
+			</a>
+			<a class="mui-tab-item" type="main">
+				<span class="mui-icon p-main"></span>
+				<span class="mui-tab-label">我的病人</span>
+			</a>
+			<a class="mui-tab-item" type="gz">
+				<span class="mui-icon p-gz"></span>
+				<span class="mui-tab-label">关注病人</span>
+			</a>
+			<a class="mui-tab-item" type="hz">
+				<span class="mui-icon p-hz"></span>
+				<span class="mui-tab-label">会诊病人</span>
+			</a>
+			<a class="mui-tab-item" type="more">
+				<span class="mui-icon p-more"></span>
+				<span class="mui-tab-label">更多</span>
+			</a>
+		</nav>
+		<div id="content" class="mui-content" style="background: #F6F6F6;overflow-y:auto ;">
+		</div>
+
+		<div id="logining" style="position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: 10;
+			background:#F6F6F6;display: none;padding-top: 20%;">
+			<div style="text-align: center;color: #999;font-size: 2rem;">
+				我正努力为您加载。。。
+			</div>
+		</div>
+
+		<div id="downloading" style="position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: 10;
+			background:#F6F6F6;display: none;padding-top: 20%;">
+			<div style="text-align: center;color: #999;font-size: 2rem;">
+				下载中。。。
+			</div>
+		</div>
+		
+		<!-- 更多 -->
+		<div id="showMore" class="moreBtn">
+			<div class="moretype" id="btnPk">贫困病人</div>
+			<div class="moretype" id="btnLclj">临床路径</div>
+			<div class="moretype" id="btnBz">病重病人</div>
+			<div class="moretype" id="btnWz">病危病人</div>
+		</div>
+	</body>
+
+</html>
+<script src="script/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/zepto.fx.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/mui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/react.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/react-dom.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/babel.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/common.js" type="text/javascript" charset="utf-8"></script>
+<script src="script/Url.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+	mui.init({
+		keyEventBind: {
+			backbutton: false //关闭back按键监听
+		}
+	});
+
+	window.onorientationchange = function() {
+		$("#navFooter").show();
+	}
+
+	var winHeight = $(window).height();
+	$(window).resize(function() {
+		var thisHeight = $(this).height();
+		if(winHeight - thisHeight > 50) {
+			//窗口发生改变(大),故此时键盘弹出
+			//当软键盘弹出，在这里面操作
+			$("#navFooter").hide();
+		} else {
+			//窗口发生改变(小),故此时键盘收起
+			//当软键盘收起，在此处操作
+			$("#navFooter").show();
+		}
+	});
+	
+	var deptid ;
+	var loginid;
+	
+	mui.plusReady(function() {
+		var self = plus.webview.currentWebview();
+		deptid = self.deptid;
+		loginid = self.loginid;
+		setNameAndDept(self.name, self.dept);
+
+		$('#loginid').val(localStorage.getItem("loginid"));
+
+		query({});
+	});
+
+	function setNameAndDept(name, dept) {
+		$('#empname').html(name);
+		$('#dept').html("(" + dept + ")");
+	}
+
+	$('#loginid').on('focus', function() {
+		if($(this).val()) {
+			$(this).parent().next().children().show();
+		}
+	});
+
+	$('#loginid').on('blur', function() {
+		$(this).parent().next().children().hide();
+	});
+
+	$('#loginid').on('keyup', function() {
+		if($(this).val()) {
+			$(this).parent().next().children().show();
+		} else {
+			$(this).parent().next().children().hide();
+		}
+	});
+
+	$('#password').on('focus', function() {
+		if($(this).val()) {
+			$(this).parent().next().children().show();
+		}
+	});
+
+	$('#password').on('blur', function() {
+		$(this).parent().next().children().hide();
+	});
+
+	$('#password').on('keyup', function() {
+		if($(this).val()) {
+			$(this).parent().next().children().show();
+		} else {
+			$(this).parent().next().children().hide();
+		}
+	});
+
+	$('#password_').on('focus', function() {
+		if($(this).val()) {
+			$(this).parent().next().children().show();
+		}
+	});
+
+	$('#password_').on('blur', function() {
+		$(this).parent().next().children().hide();
+	});
+
+	$('#password_').on('keyup', function() {
+		if($(this).val()) {
+			$(this).parent().next().children().show();
+		} else {
+			$(this).parent().next().children().hide();
+		}
+	});
+
+	$('.icon-clear').on('tap', function() {
+		$(this).parent().prev().children().val('');
+		$(this).hide();
+	});
+
+	window.onorientationchange = function() { // 移动端测试有用,屏幕颠倒时
+		//window.location.reload();
+	};
+
+	$('#deptBtn').on('tap', function() {
+		//检查是否有多个科室
+		$.ajax({
+			type: 'POST',
+			url: Url_ + '/deskNurse/doctor/getDeptByEmp.do',
+			data: {
+				empid: loginid
+			},
+			dataType: 'json',
+			success: function(data) {
+				if(data.length > 1) {
+					mui.openWindow({
+						url: "html/changeDept.html",
+						id: "changeDept",
+						extras: {
+							data: data
+						}
+					});
+					return;
+				}
+
+				if(data.length == 1) {
+					mui.toast("您只有当前科室权限");
+				}
+
+				if(data.length == 0) {
+					mui.toast("没有科室权限，请联系管理员");
+					return;
+				}
+			}
+		});
+
+	});
+
+	function requery(selectDeptid, selectDept) {
+		deptid = selectDeptid;
+		localStorage.setItem("deptid", deptid);
+		localStorage.setItem("dept", selectDept);
+		$('#dept').html("(" + selectDept + ")");
+		query(g_param);
+	}
+	//选择科室后刷新病人列表
+	window.addEventListener('refresh', function(e) {
+		requery(e.detail.selectDeptid, e.detail.selectDept);
+	});
+
+	$('#btnSet').on('tap', function() {
+		$('.setClass').css('top', $('#headerbox').height() + 1);
+		$('.setClass').fadeIn();
+	});
+
+	$('#btnSet').on('mouseleave', function() {
+		$('.setClass').fadeOut();
+	});
+
+	$('#logoutBtn').on('tap', function() {
+		localStorage.removeItem("islogin");
+		$('.setClass').fadeOut();
+		plus.webview.currentWebview().close();
+	});
+
+	$('#search').on('keydown', function(event) {
+		if(event.which === 13) {
+			var param = {
+				'param': $('#search').val()
+			};
+			query(param);
+			$('#search').val('');
+			$('#search').blur();
+		}
+	});
+
+	var g_param;
+
+	$('.mui-tab-item').on('tap', function() {
+		var type = $(this).attr('type');
+		var param = {};
+		if(type=='more'){
+			var css = $('#showMore').css("display");
+			if(css=='none'){
+				$('#showMore').fadeIn();
+			}else{
+				$('#showMore').fadeOut();
+			}
+		}else{
+			$('#showMore').fadeOut();
+			if(type == 'main') {
+				param['empid'] = loginid;
+			} else if(type == 'gz') {
+				param['active'] = 1;
+			} else if(type == 'hz') {
+				param['hzrecord'] = 1;
+			}
+			query(param);
+		}
+
+	});
+	
+	$('.moretype').on('tap', function() {
+		var id = $(this).attr('id');
+		var param = {};
+		if(id == 'btnPk') {
+			param['pkh'] = 1;
+		} else if(id == 'btnLclj') {
+			param['lclj'] = 1;
+		} else if(id == 'btnBz') {
+			param['bingqing'] = '2';
+		}else if(id=='btnWz'){
+			param['bingqing'] = '3';
+		}
+		
+		$('#showMore').fadeOut();
+		
+		query(param);
+
+	});
+
+	function query(param) {
+		g_param = param;
+		param['deptid'] = deptid;
+		param['loginid'] = loginid;
+
+		$.ajax({
+			type: 'POST',
+			url: Url_ + '/deskNurse/doctor/getIndexPatient.do',
+			data: param,
+			dataType: "json",
+			success: function(data) {
+				load(data);
+			}
+		});
+	}
+
+	function active(patientid, flag) {
+		var param = {};
+		param['patientid'] = patientid;
+		param['empid'] = loginid;
+		param['follow'] = flag;
+
+		$.ajax({
+			type: 'POST',
+			url: Url_ + '/deskNurse/doctor/followPatient.do',
+			data: param,
+			dataType: "json",
+			success: function(data) {
+				if(!data.success) {
+					mui.alert("关注失败，请联系管理员");
+				} else {
+					query(g_param);
+				}
+			}
+		});
+
+	}
+
+	$("#updateBtn").on('tap', function() {
+		checkVersion();
+		$('.setClass').fadeOut();
+	});
+
+	$('#mdfpwdBtn').on('tap', function() {
+		mui.openWindow({
+			url: "html/modifyPassword.html",
+			id: "modifyPassword",
+			extras: {
+				loginid: loginid
+			}
+		});
+		//$('#modifyPassword').show();
+	});
+
+	function checkVersion() {
+		var reqUrl = Url_ + "/deskNurse/desk/checkVersion.do";
+		var appVersion;
+		plus.runtime.getProperty(plus.runtime.appid, function(inf) {
+			appVersion = inf.version;
+			$.ajax({
+				type: 'POST',
+				url: reqUrl,
+				data: {
+					'appVersion': appVersion,
+					'type': '2'
+				},
+				dataType: "json",
+				success: function(data) {
+					if(data.update) {
+						var btnArray = ['否', '是'];
+						mui.confirm('确认下载升级包', '有新版本可更新', btnArray, function(e) {
+							if(e.index == 1) {
+								downloadApp(data.versionCode);
+							}
+						})
+					} else {
+						mui.toast("没有版本可更新");
+					}
+				}
+			});
+		});
+	}
+
+	function downloadApp(versionCode) {
+		$('#downloading').show();
+		var url = Url_ + "/deskNurse/desk/downloadFile.do?versionCode=" + versionCode;
+		var dtask = plus.downloader.createDownload(url, {}, function(d, status) {
+			if(status == 200) { // 下载成功
+				$('#downloading').hide();
+				var path = d.filename;
+				installWgt(d.filename);
+			} else { //下载失败
+				alert("Download failed: " + status);
+			}
+		}).start();
+	}
+	// 更新应用资源
+	function installWgt(path) {
+		plus.runtime.install(path, {}, function() {
+			plus.nativeUI.closeWaiting();
+			plus.nativeUI.alert("应用资源更新完成！", function() {
+				plus.runtime.restart();
+			});
+		}, function(e) {
+			plus.nativeUI.closeWaiting();
+			plus.nativeUI.alert("安装文件失败[" + e.code + "]：" + e.message);
+		});
+	}
+</script>
+
+<script type="text/babel">
+	//性別
+	function Sex(props) { 
+		const sex = props.sex; 
+		if (sex==1) { 
+			return <div class="sex boy"></div>; 
+		} 
+		return <div class="sex girl"></div>; 
+	}
+	//病人类型图片 
+	function TypeImg(props){ 
+		const type = props.type; 
+		if(type=="pt"){ 
+			return	<div class="type pt"></div>; 
+		}else if(type=="wz"){ 
+			return <div class="type wz"></div>; 
+		}else if(type=='bz'){ 
+			return <div class="type bz"></div>; 
+		}else if(type=='sw'){ 
+			return <div class="type sw"></div>; 
+		} 
+	} 
+	
+	function NlLevel(props){
+		const nl = props.nl;
+		if(nl=="3"){ 
+			return	<div class="nl-level three">三级护理</div>; 
+		}else if(nl=="2"){ 
+			return <div class="nl-level two">二级护理</div>; 
+		}else if(nl=='1'){ 
+			return <div class="nl-level one">一级护理</div>; 
+		}
+	}
+	
+	function CardBodyFirst(props){ 
+		return (
+			<div class="card-body-first">
+				<Sex sex={props.sex} />
+				<NlLevel nl={props.nl} />
+			</div>
+		); 
+	} 
+	
+	function Type(props){ 
+		const type = props.type; 
+		if(type=="pt"){ 
+			return <div class="type-pt-color">普通病人</div>
+		}else if(type=="wz"){ 
+			return <div class="type-wz-color">病危病人</div>
+		}else if(type=='bz'){ 
+			return <div class="type-bz-color">病重病人</div>
+		}else if(type=='sw'){ 
+			return <div class="type-sw-color">死亡病人</div>
+		} 
+	} 
+	
+	function CardBodySecond(props){ 
+		return (
+			<div class="card-body-second">
+				<div>{props.name}</div>
+				<div>{props.age}岁</div>
+				<Type type={props.type}/>
+			</div>
+		); 
+	} 
+	
+	class IsActive extends React.Component{ 
+		constructor(props) { 
+			super(props); 
+			this.state = {isToggleOn: false};//当前状态
+			this.active = props.active;//是否选中 
+			this.patientid = props.patientid;//病人ID 
+			if(this.active==1){ 
+				this.state = {isToggleOn: true};//关注 
+			}else{ 
+				this.state = {isToggleOn: false};//没有关注 
+			} 
+			this.handleClick = this.handleClick.bind(this); 
+		} 
+		
+		handleClick() { 
+			this.setState(prevState => ({ isToggleOn: !prevState.isToggleOn })); 
+			this.active=this.active==0?1:0; 
+			active(this.patientid,this.active); 
+		} 
+		
+		render() { 
+			if(this.state.isToggleOn){ 
+				return <span onClick={this.handleClick} class="mui-icon icon-gz gz-active"></span>; 
+			}else{ 
+				return <span onClick={this.handleClick} class="mui-icon icon-gz"></span>; 
+			} 
+		} 
+	} 
+	function CardBodyThird(props){ 
+		return (
+			<div class="card-body-third">
+				<div><span>{props.bedno}</span>
+					<IsActive patientid={props.patientid} active={props.active}/>
+				</div>
+				<div><span>{props.zyh}</span></div>
+				<div>入院时间：<span>{props.rydate}</span></div>
+			</div>
+		); 
+	} 
+	
+	function CardSign(props){
+		let pkh_flag = props.pkh_flag;
+		let lclj_flag = props.lclj_flag;
+		
+		let items = [];
+		
+		if(pkh_flag==1){
+			items.push(<div>贫困</div>);
+		}
+		
+		if(lclj_flag==1){
+			items.push(<div>临床路径</div>);
+		}
+		
+		if(pkh_flag==0&&lclj_flag==0){
+			items.push(<div class="none">无</div>);
+		}
+		return(
+			<div class="card-sign">
+				{items}
+			</div>
+		);
+	}
+	
+	function CardContent(props){
+		return(
+			<div class="card-body-content">
+				<CardBodySecond name={props.name} age={props.age} type={props.type}/>
+				<CardBodyThird bedno={props.bedno} active={props.active} patientid={props.patientid} zyh={props.zyh} rydate={props.rydate}/>
+				<CardSign pkh_flag={props.pkh_flag} lclj_flag={props.lclj_flag}/>
+			</div>
+		);
+	}
+	
+	function CardBody(props){ 
+		return (
+			<div class="card-body">
+				<CardBodyFirst sex={props.sex} nl={props.nl}/>
+				<CardContent name={props.name} age={props.age} type={props.type} bedno={props.bedno} rydate={props.rydate}
+					active={props.active} patientid={props.patientid} zyh={props.zyh} pkh_flag={props.pkh_flag} lclj_flag={props.lclj_flag}/>
+			</div>
+		); 
+	}
+	
+	function CardFooter(props){ 
+		return (
+			<div class="card-footer">
+				<div>
+					<div>
+						<span class="mui-icon icon-jybg"></span>
+					</div>
+					<div>
+						<span>检验报告</span>
+					</div>
+					<div>
+						<span>{props.jynum}</span>
+					</div>
+				</div>
+				<div>
+					<div>
+						<span class="mui-icon icon-jcbg"></span>
+					</div>
+					<div>
+						<span>检查报告</span>
+					</div>
+					<div>
+						<span>{props.jcnum}</span>
+					</div>
+				</div>
+			</div>
+		); 
+	} 
+	
+	class Inbutton extends React.Component{ 
+		constructor(props) { 
+			super(props); 
+			this.patientid = props.patientid; 
+			this.handleClick = this.handleClick.bind(this); 
+		} 
+		
+		handleClick() { 
+			localStorage.setItem("patientid",this.patientid); 
+			$('#logining').show(); 
+			mui.preload({ url:'/html/page2.html', id:'page2' }); 
+			setTimeout(function(){ 
+				mui.openWindow({ url:'/html/page2.html', id:'page2' }); 
+				setTimeout(function(){ 
+					$('#logining').hide(); 
+				},1000);
+			},600);
+		} 
+		render() { 
+			return (
+				<div class="inbutton" onClick={this.handleClick}>
+					<span class="mui-icon arrow-up"></span>
+				</div>
+			); 
+		} 
+	} 
+	
+	function Card(props){ 
+		return (
+			<div>
+				<div class="card">
+					<CardBody bedno={props.bedno} active={props.active} zyh={props.zyh} rydate={props.rydate} name={props.name} sex={props.sex} 
+						type={props.type} age={props.age} patientid={props.patientid} pkh_flag={props.pkh_flag} lclj_flag={props.lclj_flag} nl={props.nl}/>
+					<CardFooter jynum={props.jynum} jcnum={props.jcnum}/>
+					<Inbutton patientid={props.patientid} />
+				</div>
+			</div>
+		); 
+	} 
+	
+	function Repeat(props){ 
+		let list = props.data; 
+		let items = []; 
+		for(let i=0;i<list.length;i++){ 
+			items.push(<Card bedno={list[i].bedno} active={list[i].active} zyh={list[i].zyh} rydate={list[i].rydate} name={list[i].name} 
+				sex={list[i].sex} type={list[i].type} age={list[i].age} jynum={list[i].jynum} jcnum={list[i].jcnum} patientid={list[i].patientid} 
+				pkh_flag={list[i].pkh_flag} lclj_flag={list[i].lclj_flag} nl={list[i].nl}/>);
+		} 
+		return <div>{items}</div>
+	} 
+	
+	function Silder(){ 
+		return (
+			<div class="mui-loading">
+				<div class="mui-spinner"></div>
+			</div>
+		);
+	}
+	
+	function load(data){ 
+		ReactDOM.render(
+			<Silder />, document.getElementById('content') 
+		); 
+		ReactDOM.render(
+			<Repeat data={ data}/>, document.getElementById('content') 
+		); 
+	}
+
+</script>

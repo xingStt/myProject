@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>便签</title>
+	<link rel="stylesheet" href="../css/mui.min.css" />
+	<script type="text/javascript" src="../script/mui.min.js"></script>
+	<script type="text/javascript" src="../script/zepto.min.js"></script>
+	<script type="text/javascript" src="../script/Url.js"></script>
+	<script>
+	</script>
+	<style type="text/css">
+			@font-face {
+				font-family: Muiicons;
+				font-weight: normal;
+				font-style: normal;
+				src: url('../fonts/fangda.ttf') format('truetype');
+			}
+
+			.mui-icon-fangda:before {
+				content: '\e70e';
+				font-size: 1.4rem;
+				color: #8B8878;
+			}
+
+			* {
+				-webkit-user-select: none;
+				-ms-touch-select: none;
+			}
+			body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				font-size: 16px;
+				background-color: #f6f6f6;
+			}
+			#note,#picbox,#videobox,#recordbox{
+				box-shadow: 0px 6px 20px 0px rgba(71, 71, 71, 0.1);
+				border-radius: 5px;
+				margin-top: 0.5rem;
+				padding:0.1rem;
+				display:none;
+			}
+			#note div{
+				font-size: 18px;
+			}
+			.fullScreen{
+				position: absolute;
+				margin-left: -20px;
+				margin-top: 147px;
+				font-size:30px;
+				z-index: 9999;
+			}
+			video::-webkit-media-controls-fullscreen-button {
+			  display: none;
+			}
+			img,video{
+				margin-left:5px;
+			}
+		</style>
+</head>
+<body>
+<div style="background-color: #F6F6F6;padding:0.5rem;overflow: hidden;" class="mui-content">
+	<div id="note">
+	</div>
+	<div id="picbox">
+	</div>
+	<div id="videobox">
+	</div>
+	<div id="recordbox">
+	</div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+	mui.init();
+	var Url_st="http://192.168.23.1:8280";
+	 $(document).ready(function() {
+		plusReady();
+	});
+	var noteid = localStorage.getItem("noteid");
+	function plusReady() {
+		mui.ajax(Url_+'/deskNurse/doctor/getNoteInfo.do',{
+			type: 'post',
+			dataType: 'json',
+			data: {
+				'noteid': noteid
+			},
+			success:function(data){
+				if(data.note.length>0){
+					$("#note").css('display','block');
+					$("#note").append('<div>'+data.note+'</div>');
+				}
+			},
+			error:function(){
+			}
+		});
+		mui.ajax(Url_ + '/deskNurse/doctor/getNoteFiles.do', {
+			type: 'post',
+			dataType: 'json',
+			data: {
+				'noteid': noteid
+			},
+			success: function(data) {
+				for(var i = 0; i < data.length; i++) {
+					//文件数据库的路径
+					var filePathName = data[i].file_name;
+					var index = filePathName.lastIndexOf("\/");
+					//文件名称和后缀
+					var fileName = filePathName.substring(index + 1, filePathName.length);
+					if("picture" == data[i].file_type) {
+					    $("#picbox").css('display','block');
+						$("#picbox").append('<img  onClick="displayPhoto(\''+Url_st+data[i].file_name+'\')" width="190px" height="190px" src="'+Url_st+data[i].file_name+'">');
+					}
+					if("vedio" == data[i].file_type) {
+						var poster = data[i].poster;
+						alert(poster);
+					    $("#videobox").css('display','block');
+						var iindex=fileName.lastIndexOf(".");
+						//视频名称(无后缀)
+						var videoid=fileName.substring(0,iindex);
+						isExitVideoFile(videoid,fileName, filePathName,poster);
+					}
+					if("audio" == data[i].file_type) {
+					    $("#recordbox").css('display','block');
+						$("#recordbox").append('<audio controls="controls" src="'+Url_st+data[i].file_name+'"></audio>');
+					}
+				}
+			}
+		})
+	}
+
+	function isExitVideoFile(videoid,fileName, filePathName,poster) {
+		$("#videobox").append('<video id="'+videoid+'" width="190px" height="190px" controls="controls" poster="'+Url_st+poster+'"></video><a class="mui-icon mui-icon-fangda fullScreen '+videoid+'"></a>');
+		parent.plus.io.resolveLocalFileSystemURL('_doc/video/' + fileName, function(entry) {
+			//本地存在视频文件
+			var localpath = parent.plus.io.convertLocalFileSystemURL('_doc/video/' + fileName);
+			$("#"+videoid).attr("src",localpath);
+			$("."+videoid).unbind('tap');
+			$("."+videoid).bind('tap',function(){
+				fullScreen(localpath);
+			})
+		}, function(e) {
+			$("#"+videoid).attr("src",Url_st+filePathName);
+			//点击播放按钮的时候下载文件
+			$("#"+videoid).bind('play',function(){
+				downLoadFile(Url_st + filePathName,fileName,videoid);
+			});
+			$("."+videoid).unbind('tap');
+			$("."+videoid).bind('tap',function(){
+				fullScreen(Url_st+filePathName);
+			})
+		});
+	}
+	function downLoadFile(path,fileName,videoid){
+		parent.plus.io.resolveLocalFileSystemURL('_doc/video/' + fileName, function(entry) {
+			//本地存在视频文件
+		}, function(e) {//本地不存在文件，下载文件到本地
+			var dtask = parent.plus.downloader.createDownload(path, {
+				filename: '_doc/video/' + fileName
+			}, function(d, status) {
+				// 下载完成
+				if(status == 200) {
+					var video = document.getElementById(videoid);
+					var currentTime  = video.currentTime;
+					$("#"+videoid).attr("src",parent.plus.io.convertLocalFileSystemURL('_doc/video/'+fileName));
+					video.currentTime=currentTime;
+					video.play();
+					$("."+videoid).unbind('tap');
+          			$("."+videoid).bind('tap',function(){
+          				fullScreen(parent.plus.io.convertLocalFileSystemURL('_doc/video/'+fileName));
+        			});
+				} else {
+				}
+			});
+			dtask.start();
+		})
+	}
+
+	function fullScreen(path,successCallback, errorCallback){
+		B = window.parent.plus.bridge;/*插件调用桥梁*/
+        var success = typeof successCallback !== 'function' ? null : function(args) {
+                    successCallback(args);
+        },
+        fail = typeof errorCallback !== 'function' ? null : function(code) {
+                errorCallback(code);
+           },
+        callbackID = B.callbackId(success, fail);
+        return B.exec("FullScreen", "startPlay", [callbackID,path]);
+	}
+
+	function displayPhoto(path) {
+		parent.mui.openWindow({
+			url: '../showPic.html',
+			id: 'showPic',
+			preload: false,
+			extras: {
+				path: path
+			},
+			show: {
+				aniShow: 'pop-in'
+			},
+			styles: {
+				popGesture: 'hide'
+			},
+			waiting: {
+				autoShow: true
+			}
+		})
+	}
+</script>

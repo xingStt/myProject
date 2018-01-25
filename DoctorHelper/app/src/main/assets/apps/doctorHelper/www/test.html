@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=3.0, user-scalable=yes" />
+		<meta name="HandheldFriendly" content="true" />
+		<meta name="MobileOptimized" content="320" />
+		<title>Hello H5+</title>
+		<script type="text/javascript" src="script/zepto.min.js" ></script>
+		<script type="text/javascript" src="script/mui.min.js"></script>
+		<script type="text/javascript" src="script/common.js"></script>
+		<script type="text/javascript">
+			document.addEventListener( "plusready", function()
+			{
+				var _BARCODE = 'LocalCamera', 
+				B = window.plus.bridge/*插件调用桥梁*/;
+				var mediaRecorder = 
+			    {
+			        "startRecorder":function(successCallback, errorCallback){
+			            var success = typeof successCallback !== 'function' ? null : function(args) {
+			                        successCallback(args);
+			            },
+		                fail = typeof errorCallback !== 'function' ? null : function(code) {
+		                        errorCallback(code);
+		                    },
+		                callbackID = B.callbackId(success, fail);
+			            return B.exec("MediaRecorder", "startRecorder", [callbackID]);
+				     }
+			    };
+				
+				var nativeContact = 
+			 	{
+			        "pick":function(successCallback, errorCallback){
+			            var success = typeof successCallback !== 'function' ? null : function(args) {
+			                        successCallback(args);
+			            },
+		                fail = typeof errorCallback !== 'function' ? null : function(code) {
+		                        errorCallback(code);
+		                    },
+		                callbackID = B.callbackId(success, fail);
+			            return B.exec("NativeContact", "pick", [callbackID]);
+				     }
+			    };
+				
+				
+				 var localCamera = 
+			 	{
+			        "startCamera":function(successCallback, errorCallback){
+			            var success = typeof successCallback !== 'function' ? null : function(args) {
+			                        successCallback(args);
+			            },
+		                fail = typeof errorCallback !== 'function' ? null : function(code) {
+		                        errorCallback(code);
+		                    },
+		                callbackID = B.callbackId(success, fail);
+			            return B.exec(_BARCODE, "startCamera", [callbackID]);
+				     }
+			    }; 
+				
+			window.plus.nativeContact = nativeContact;
+		    window.plus.mediaRecorder = mediaRecorder;
+		    window.plus.localCamera = localCamera;
+		   
+		}, true );
+			
+			
+			
+				function video(){
+					plus.mediaRecorder.startRecorder();
+				}
+				
+				function camera(){
+					plus.localCamera.startCamera();
+				}
+				
+				function sdf(){
+					plus.nativeContact.pick();
+				}
+				
+		</script>
+	</head>
+	<body style="text-align:center;">
+	<button  onclick="video()">video</button>
+	<button  onclick="camera()">video1</button>
+	<button  onclick="sdf()">video2</button>
+	</body>
+</html>

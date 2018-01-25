@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>检查报告</title>
+    <link rel="stylesheet" type="text/css" href="../css/mui.min.css"/>
+    <style type="text/css">
+    	/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/  
+		::-webkit-scrollbar  
+		{  
+		    width: 4px;  
+		    height: 4px;  
+		    background-color: #F6F6F6;  
+		}  
+		  
+		/*定义滚动条轨道 内阴影+圆角*/  
+		::-webkit-scrollbar-track  
+		{  
+		    -webkit-box-shadow: inset 0 0 2px #F6F6F6;  
+		    border-radius: 2px;  
+		    background-color: #F6F6F6;  
+		}  
+		  
+		/*定义滑块 内阴影+圆角*/  
+		::-webkit-scrollbar-thumb  
+		{  
+		    border-radius: 10px;  
+		    -webkit-box-shadow: inset 0 0 2px #F6F6F6;  
+		    background-color: rgba(187,187,187,.6);  
+		}  
+    	
+    	body{
+    		padding: 1rem;
+    		margin: 0;
+    		background: #F6F6F6;
+    		overflow-y: auto;
+    		padding-bottom: 3rem;
+    	}
+    	
+    	li{
+    		height: 4.4rem;
+    		line-height: 3rem;
+    		font-size: 1.6rem;
+    	}
+    	
+    	a{
+    		color: #333;
+    	}
+    	
+    	a>span{
+    		margin-left: 2rem;
+    		color: #999!important;
+    	}
+    	
+    	.mui-loading{
+			margin-top: 20%;
+		}
+    	
+    	@media only screen and (max-width:1000px ) {
+    		li{
+	    		height: 6rem;
+	    		line-height: 5rem;
+	    	}
+    	}
+    	
+    </style>
+</head>
+<body id="body">
+</body>
+</html>
+<script src="../script/zepto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/mui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/react-dom.production.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/babel.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../script/Url.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	
+</script>
+
+<script type="text/babel">
+	load();
+	function load(){
+		ReactDOM.render(
+	  	  <Silder />,
+		  document.getElementById('body')
+		);
+		
+		$.ajax({
+	        type: 'POST',
+	        url: Url_+'/deskNurse/doctor/getNoteList.do',
+	        data:{patientid:localStorage.getItem("patientid")},
+	        dataType: "json",
+	        success: function(data){
+	        	if(data.length==0){
+	        		document.getElementById('body').innerHTML = 
+	        		'<div style="text-align: center;font-size: 2rem;color: #999;margin-top: 20%;">没有检验报告</div>';
+	        	}else{
+	        		ReactDOM.render(
+				  	  <Repeat data = {data}/>,
+					  document.getElementById('body')
+					);
+	        	}
+	        }
+	 	});
+	}
+	
+	function Silder(){
+		return (<div class="mui-loading"><div class="mui-spinner"></div></div>);
+	}
+	
+	function Repeat(props){
+		let list = props.data;
+		let items = [];
+		for(let i=0;i<list.length;i++){
+			items.push(<Note noteid={list[i].id} empname={list[i].empname} note={list[i].note} lrdate={list[i].lr_date} />);
+		}
+		return <ul class="mui-table-view">{items}</ul>;
+	}
+	
+	class Note extends React.Component{
+	  constructor(props) {
+	    super(props);
+		this.noteid = props.noteid;
+		this.empname = props.empname;
+		this.note = props.note;
+		this.lrdate = props.lrdate;
+	    this.handleClick = this.handleClick.bind(this);
+	  }
+	  handleClick() {
+	  	parent.MENU_LEVEL = 2;
+	  	localStorage.setItem("noteid",this.noteid);
+	    window.location.href='noteInfo.html';
+	  }
+	  render() {
+	    return (
+	        <li class="mui-table-view-cell" onClick={this.handleClick}>
+				<a class="mui-navigate-right">
+					{this.empname} <span>{this.lrdate}&nbsp;&nbsp;&nbsp;{this.note}</span>
+				</a>
+			</li>
+	    );
+	  }
+	}
+</script>
